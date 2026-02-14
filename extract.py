@@ -1,5 +1,22 @@
 import requests
 import json
+from datetime import datetime
+
+#gets index of current time in time list from the hourly data
+def get_current_time_index(current_time_date, times):
+    for i in range(len(times)):
+        if current_time_date == times[i]:
+            return i
+        elif times[i] < current_time_date < times[i+1]:
+            min_value = min(abs(current_time_date - times[i]), abs(current_time_date - times[i+1]))
+            if min_value == abs(current_time_date - times[i]):
+                return i
+            else:
+                return i+1
+            
+def print_weather_data(weather_data):
+    for key, value in weather_data.items():
+        print(f"{key}: {value}")
 
 # Coordinates for a location (e.g., Berlin, Germany)
 latitude = -22
@@ -25,28 +42,23 @@ try:
     with open("weather_data.json", "w") as f:
         json.dump(data, f, indent=2)
 
-    current_time = data["current_weather"]["time"] #gets the current time
-
+    format_date = "%Y-%m-%dT%H:%M"
     hourly_data = data["hourly"]
-    time_index = hourly_data["time"].index(current_time)
+    times = hourly_data["time"]
+    for i in range(len(times)): 
+        times[i] = datetime.strptime(times[i], format_date) #converts dates in times from string to datetime objects
+
+    current_time_str = data["current_weather"]["time"] #gets the current time
+    current_time_date = datetime.strptime(current_time_str, format_date) #converts current time to datetime object
+    time_index = get_current_time_index(current_time_date, times) 
 
     #gets the data relative to the current time
-    temperature = hourly_data["temperature_2m"][time_index]
-    humidity = hourly_data["relative_humidity_2m"][time_index]
-    precipitacion_prob = hourly_data["precipitation_probability"][time_index]
-
-    print(temperature)
-    print(humidity)
-    print(precipitacion_prob)
-
-
-
-    '''print(f"Current Temperature: {current_weather['temperature']} °C")
-    print(f"Current Wind Speed: {current_weather['windspeed']} km/h")
-    print(f"Time: {current_weather['time']}")'''
-
-    # You can also access hourly data
-    # print(json.dumps(data["hourly"], indent=2))
+    weather_data = {}
+    weather_data["Time"] = current_time_str
+    weather_data["temperature"] = hourly_data["temperature_2m"][time_index]
+    weather_data["humidity"] = hourly_data["relative_humidity_2m"][time_index]
+    weather_data["precipitacion_prob"] = hourly_data["precipitation_probability"][time_index]
+    print_weather_data(weather_data)
 
 except requests.exceptions.RequestException as e:
     print(f"Error fetching data: {e}")
