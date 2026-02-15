@@ -1,4 +1,5 @@
 import requests
+import pandas as pd
 import json
 from datetime import datetime
 
@@ -44,9 +45,7 @@ try:
 
     format_date = "%Y-%m-%dT%H:%M"
     hourly_data = data["hourly"]
-    times = hourly_data["time"]
-    for i in range(len(times)): 
-        times[i] = datetime.strptime(times[i], format_date) #converts dates in times from string to datetime objects
+    times = [datetime.strptime(t, format_date) for t in hourly_data["time"]]
 
     current_time_str = data["current_weather"]["time"] #gets the current time
     current_time_date = datetime.strptime(current_time_str, format_date) #converts current time to datetime object
@@ -54,11 +53,13 @@ try:
 
     #gets the data relative to the current time
     weather_data = {}
-    weather_data["Time"] = current_time_str
-    weather_data["temperature"] = hourly_data["temperature_2m"][time_index]
-    weather_data["humidity"] = hourly_data["relative_humidity_2m"][time_index]
-    weather_data["precipitacion_prob"] = hourly_data["precipitation_probability"][time_index]
-    print_weather_data(weather_data)
+    weather_data["Time"] = hourly_data["time"][time_index:]
+    weather_data["Temperature"] = hourly_data["temperature_2m"][time_index:]
+    weather_data["Humidity"] = hourly_data["relative_humidity_2m"][time_index:]
+    weather_data["Precipitacion Probability"] = hourly_data["precipitation_probability"][time_index:]
+
+    df_data = pd.DataFrame(weather_data)
+    print(df_data)
 
 except requests.exceptions.RequestException as e:
     print(f"Error fetching data: {e}")
