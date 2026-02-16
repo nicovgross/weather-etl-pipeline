@@ -1,6 +1,21 @@
 import pandas as pd
 import json
 
+def validate_weather_data(df):
+    #Check null values
+    for column in df_data.columns:
+        assert df_data[column].isnull().sum() == 0, f"There are null values in column {column}"
+
+    #Assert there are no absurd values
+    assert df_data["temperature_c"].between(-89.2, 56.7).all(), "Inconsistent temperature detected"
+    assert df_data["apparent_temperature_c"].between(-89.2, 56.7).all(), "Inconsistent apparent temperature detected"
+    assert df_data["relative_humidity_%"].between(0,100).all(), "Inconsistent relative humidity detected"
+    assert df_data["precipitation_probability_%"].between(0,100).all(), "Inconsistent precipitation probability detected"
+    assert df_data["precipitation_mm"].ge(0).all(), "Inconsistent precipitation detected"
+    assert df_data["wind_speed_kmh"].between(0,408).all(), "Inconsistent wind speed detected detected"
+    assert df_data["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
+    assert df_data["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
+
 #Open json file with the weather data extracted by extract.py
 with open("../data/raw/weather_data.json", "r") as f:
     data_dict = json.load(f)
@@ -52,6 +67,7 @@ df_data["weather_description"] = df_data["weather_code"].map(WEATHER_CODE_MAP)
 
 #Format time column to datetime type, instead of string
 df_data["time"] = pd.to_datetime(df_data["time"], format="%Y-%m-%dT%H:%M")
+df_data = df_data.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered
 
 #Separate time column into different columns
 df_data["year"] = df_data["time"].dt.year
@@ -59,11 +75,10 @@ df_data["month"] = df_data["time"].dt.month
 df_data["day"] = df_data["time"].dt.day
 df_data["hour"] = df_data["time"].dt.hour
 
-print(df_data)
-print("\n\n")
+validate_weather_data(df_data)
 
 #Store the extracted data in a json file
 df_data.to_json("../data/processed/processed_weather_data.json", orient="records", date_format="iso", indent=2)
 
 #Convert to excel file for visualization
-df_data.to_excel("../data/Hourly_data.xlsx")
+df_data.to_excel("../data/Sample_data.xlsx")
