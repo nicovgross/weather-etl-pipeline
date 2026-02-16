@@ -65,11 +65,5 @@ print("\n\n")
 #Store the extracted data in a json file
 df_data.to_json("../data/processed/processed_weather_data.json", orient="records", date_format="iso", indent=2)
 
-with open("../data/processed/processed_weather_data.json", "r") as f:
-    numseioq = json.load(f)
-
-numseiquela = pd.DataFrame(numseioq)
-print(numseiquela)
-
 #Convert to excel file for visualization
 df_data.to_excel("../data/Hourly_data.xlsx")
