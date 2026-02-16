@@ -4,7 +4,7 @@ from extract import *
 latitude = -22
 longitude = -43
 
-params = {
+params = { #Define parameters
     "latitude": latitude,
     "longitude": longitude,
     "hourly": ["temperature_2m", "apparent_temperature", "relative_humidity_2m", "precipitation_probability",
@@ -13,4 +13,4 @@ params = {
     "current_weather": True
 }
 
-extract(params)
+extract_data(params)
