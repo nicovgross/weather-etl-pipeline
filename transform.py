@@ -1,15 +1,17 @@
 import pandas as pd
 import json
 
+#Open json file with the weather data extracted by extract.py
 with open("weather_data.json", "r") as f:
     data_dict = json.load(f)
 
+#renaming columns, detailing units of measurement
 df_data = pd.DataFrame(data_dict)
 df_data.rename(columns={
     "temperature_2m": "temperature_c",
     "apparent_temperature_2m": "apparent_temperature_c",
     "relative_humidity_2m": "relative_humidity_%",
-    "precipitation_probability": "precipitation_probability_%" ,
+    "precipitation_probability": "precipitation_probability_%",
     "precipitation": "precipitation_mm",
     "windspeed_10m": "windspeed_kmh",
     "winddirection_10m": "winddirection_deg",
@@ -17,6 +19,7 @@ df_data.rename(columns={
     "couldcover": "cloud_cover_%"
 }, inplace=True)
 
+#Adding weather description based on weather code
 WEATHER_CODE_MAP = {
     0: "Clear sky",
     1: "Mainly clear",
@@ -45,6 +48,12 @@ WEATHER_CODE_MAP = {
     96: "Thunderstorm with heavy hail",
     99: "Thunderstorm with heavy hail"
 }
-
 df_data["weather_description"] = df_data["weather_code"].map(WEATHER_CODE_MAP)
 
+#Formatting time column to datetime type, instead of string
+df_data["time"] = pd.to_datetime(df_data["time"], format="%Y-%m-%dT%H:%M")
+
+df_data["year"] = df_data["time"].dt.year
+df_data["month"] = df_data["time"].dt.month
+df_data["day"] = df_data["time"].dt.day
+df_data["hour"] = df_data["time"].dt.hour
