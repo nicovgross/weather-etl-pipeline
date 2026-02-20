@@ -2,6 +2,11 @@ import requests
 import json
 from datetime import datetime
 
+'''
+This program extracts raw data from the Open-Meteo API, gets the hourly data 
+from the current time onwards and stores it in a JSON file
+'''
+
 #Get index of current time in time list from the hourly data
 def get_current_time_index(current_time_date, times):
     n = len(times)
@@ -34,21 +39,21 @@ def extract_data(params):
 
         #Convert time data from string to datetime object
         format_date = "%Y-%m-%dT%H:%M"
-        hourly_data = data["hourly"]
-        times = [datetime.strptime(t, format_date) for t in hourly_data["time"]]
+        raw_data = data["hourly"]
+        times = [datetime.strptime(t, format_date) for t in raw_data["time"]]
 
         current_time_str = data["current_weather"]["time"] #gets the current time
         current_time_date = datetime.strptime(current_time_str, format_date) #converts current time to datetime object
         time_index = get_current_time_index(current_time_date, times) 
 
         #Get the data relative to the current time
-        weather_data = {}
-        for key, value in hourly_data.items():
-            weather_data[f"{key}"] = value[time_index:]
+        raw_weather = {}
+        for key, value in raw_data.items():
+            raw_weather[f"{key}"] = value[time_index:]
 
-        #Store the extracted data in a json file
-        with open("../data/raw/weather_data.json", "w") as f:
-            json.dump(weather_data, f, indent=2)
+        #Store the extracted data in a JSON file
+        with open("../data/raw/raw_weather.json", "w") as f:
+            json.dump(raw_weather, f, indent=2)
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")

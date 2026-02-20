@@ -7,22 +7,22 @@ def validate_weather_data(df):
         assert df[column].isnull().sum() == 0, f"There are null values in column {column}"
 
     #Assert there are no absurd values
-    assert df_data["temperature_c"].between(-89.2, 56.7).all(), "Inconsistent temperature detected"
-    assert df_data["apparent_temperature_c"].between(-89.2, 56.7).all(), "Inconsistent apparent temperature detected"
-    assert df_data["relative_humidity_%"].between(0,100).all(), "Inconsistent relative humidity detected"
-    assert df_data["precipitation_probability_%"].between(0,100).all(), "Inconsistent precipitation probability detected"
-    assert df_data["precipitation_mm"].ge(0).all(), "Inconsistent precipitation detected"
-    assert df_data["wind_speed_kmh"].between(0,408).all(), "Inconsistent wind speed detected detected"
-    assert df_data["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
-    assert df_data["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
+    assert df["temperature_c"].between(-89.2, 56.7).all(), "Inconsistent temperature detected"
+    assert df["apparent_temperature_c"].between(-89.2, 56.7).all(), "Inconsistent apparent temperature detected"
+    assert df["relative_humidity_%"].between(0,100).all(), "Inconsistent relative humidity detected"
+    assert df["precipitation_probability_%"].between(0,100).all(), "Inconsistent precipitation probability detected"
+    assert df["precipitation_mm"].ge(0).all(), "Inconsistent precipitation detected"
+    assert df["wind_speed_kmh"].between(0,408).all(), "Inconsistent wind speed detected detected"
+    assert df["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
+    assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
 #Open json file with the weather data extracted by extract.py
-with open("../data/raw/weather_data.json", "r") as f:
+with open("../data/raw/raw_weather.json", "r") as f:
     data_dict = json.load(f)
 
 #Rename columns, detailing units of measurement
-df_data = pd.DataFrame(data_dict)
-df_data.rename(columns={
+hourly_weather = pd.DataFrame(data_dict)
+hourly_weather.rename(columns={
     "temperature_2m": "temperature_c",
     "apparent_temperature": "apparent_temperature_c",
     "relative_humidity_2m": "relative_humidity_%",
@@ -63,25 +63,25 @@ WEATHER_CODE_MAP = {
     96: "Thunderstorm with heavy hail",
     99: "Thunderstorm with heavy hail"
 }
-df_data["weather_description"] = df_data["weather_code"].map(WEATHER_CODE_MAP)
+hourly_weather["weather_description"] = hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
 
 #Format time column to datetime type, instead of string
-df_data["time"] = pd.to_datetime(df_data["time"], format="%Y-%m-%dT%H:%M")
-df_data = df_data.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered
+hourly_weather["time"] = pd.to_datetime(hourly_weather["time"], format="%Y-%m-%dT%H:%M")
+hourly_weather = hourly_weather.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered
 
 #Separate time column into different columns
-df_data["year"] = df_data["time"].dt.year
-df_data["month"] = df_data["time"].dt.month
-df_data["day"] = df_data["time"].dt.day
-df_data["hour"] = df_data["time"].dt.hour
+hourly_weather["year"] = hourly_weather["time"].dt.year
+hourly_weather["month"] = hourly_weather["time"].dt.month
+hourly_weather["day"] = hourly_weather["time"].dt.day
+hourly_weather["hour"] = hourly_weather["time"].dt.hour
 
-validate_weather_data(df_data)
+validate_weather_data(hourly_weather)
 
-#Store the extracted data in a json file
-df_data.to_json("../data/processed/processed_weather_data.json", orient="records", date_format="iso", indent=2)
+#Store the extracted data in a JSON file
+hourly_weather.to_json("../data/processed/hourly_weather.json", orient="records", date_format="iso", indent=2)
 
 #Create aggregate dataframe with relevant metrics
-agg_df = df_data.set_index("time").resample("D").agg(
+daily_weather = hourly_weather.set_index("time").resample("D").agg(
     avg_temp = ("temperature_c", "mean"),
     min_temp = ("temperature_c", "min"),
     max_temp = ("temperature_c", "max"),
@@ -93,5 +93,5 @@ agg_df = df_data.set_index("time").resample("D").agg(
     max_wind_speed = ("wind_speed_kmh", "max")
 ).round(1).reset_index()
 
-#Store the aggregate data in a json file
-df_data.to_json("../data/processed/aggreagate_weather_data.json", orient="records", date_format="iso", indent=2)
+#Store the aggregate data in a JSON file
+daily_weather.to_json("../data/processed/daily_weather.json", orient="records", date_format="iso", indent=2)
