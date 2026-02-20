@@ -3,8 +3,8 @@ import json
 
 def validate_weather_data(df):
     #Check null values
-    for column in df_data.columns:
-        assert df_data[column].isnull().sum() == 0, f"There are null values in column {column}"
+    for column in df.columns:
+        assert df[column].isnull().sum() == 0, f"There are null values in column {column}"
 
     #Assert there are no absurd values
     assert df_data["temperature_c"].between(-89.2, 56.7).all(), "Inconsistent temperature detected"
@@ -80,5 +80,18 @@ validate_weather_data(df_data)
 #Store the extracted data in a json file
 df_data.to_json("../data/processed/processed_weather_data.json", orient="records", date_format="iso", indent=2)
 
-#Convert to excel file for visualization
-df_data.to_excel("../data/Sample_data.xlsx")
+#Create aggregate dataframe with relevant metrics
+agg_df = df_data.set_index("time").resample("D").agg(
+    avg_temp = ("temperature_c", "mean"),
+    min_temp = ("temperature_c", "min"),
+    max_temp = ("temperature_c", "max"),
+    temp_range = ("temperature_c", lambda x: x.max() - x.min()),
+    avg_app_temp = ("apparent_temperature_c", "mean"),
+    avg_hum = ("relative_humidity_%", "mean"),
+    avg_precipitation_prob = ("precipitation_probability_%", "mean"),
+    total_precipitation = ("precipitation_mm", "sum"),
+    max_wind_speed = ("wind_speed_kmh", "max")
+).round(1).reset_index()
+
+#Store the aggregate data in a json file
+df_data.to_json("../data/processed/aggreagate_weather_data.json", orient="records", date_format="iso", indent=2)
