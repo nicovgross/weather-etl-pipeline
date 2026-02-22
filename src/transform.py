@@ -51,8 +51,10 @@ def transform_data(city):
     with open(f"../data/raw/{city}/raw_weather.json", "r") as f:
         data_dict = json.load(f)
 
+    hourly = data_dict["hourly"]
+
     #Rename columns, detailing units of measurement
-    hourly_weather = pd.DataFrame(data_dict)
+    hourly_weather = pd.DataFrame(hourly)
     hourly_weather.rename(columns={
         "temperature_2m": "temperature_c",
         "apparent_temperature": "apparent_temperature_c",
