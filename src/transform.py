@@ -46,9 +46,9 @@ def validate_weather_data(df):
     assert df["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
-def transform_data(params):
+def transform_data(raw_file_path, params):
     #Open json file with the weather data extracted by extract.py
-    with open(f"../data/raw/{params['city']}/raw_weather.json", "r") as f:
+    with open(raw_file_path, "r") as f:
         data_dict = json.load(f)
 
     hourly = data_dict["hourly"]

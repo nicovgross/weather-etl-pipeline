@@ -16,5 +16,5 @@ for city in cities:
         "current_weather": True
     }
 
-    extract_data(params)
-    transform_data(params)
+    raw_file_path = extract_data(params)
+    transform_data(raw_file_path, params)

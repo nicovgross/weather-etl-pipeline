@@ -4,8 +4,8 @@ import os
 from datetime import datetime
 
 '''
-This program extracts raw data from the Open-Meteo API, gets the hourly data 
-from the current time onwards and stores it in a JSON file
+This program extracts raw data from the Open-Meteo API, 
+gets the hourly data and stores it in a JSON file
 '''
             
 def print_weather_data(weather_data):
@@ -24,15 +24,18 @@ def extract_data(params):
 
         #Parse the JSON response into a Python dictionary
         data = response.json()
+        date = data["current_weather"]["time"][:10] #Get current date
 
         #Make sure the file path already exist
-        file_path = f"../data/raw/{params['city']}/raw_weather.json"
-        dir_path = os.path.dirname(file_path)
+        raw_file_path = f"../data/raw/{params['city']}/{date}.json"
+        dir_path = os.path.dirname(raw_file_path)
         os.makedirs(dir_path, exist_ok=True)
 
         #Store the extracted data in a JSON file
-        with open(file_path, "w") as f:
+        with open(raw_file_path, "w") as f:
             json.dump(data, f, indent=2)
+
+        return raw_file_path
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
