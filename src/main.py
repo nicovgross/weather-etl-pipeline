@@ -1,16 +1,20 @@
 from extract import *
+from transform import *
+import json
 
-# Coordinates for a location (e.g., Berlin, Germany)
-latitude = -22
-longitude = -43
+with open("../config/cities.json", "r") as f:
+    cities = json.load(f)
 
-params = { #Define parameters
-    "latitude": latitude,
-    "longitude": longitude,
-    "hourly": ["temperature_2m", "apparent_temperature", "relative_humidity_2m", "precipitation_probability",
-                "precipitation", "windspeed_10m", "winddirection_10m", "weathercode", "cloudcover"],
-    "timezone": "America/Sao_Paulo", # Local timezone based on your location
-    "current_weather": True
-}
+for city in cities:
+    params = { #Define parameters
+        "city": city["city"],
+        "latitude": city["latitude"],
+        "longitude": city["longitude"],
+        "hourly": ["temperature_2m", "apparent_temperature", "relative_humidity_2m", "precipitation_probability",
+                    "precipitation", "windspeed_10m", "winddirection_10m", "weathercode", "cloudcover"],
+        "timezone": city["timezone"], # Local timezone based on your location
+        "current_weather": True
+    }
 
-extract_data(params)
+    extract_data(params)
+    transform_data(city["city"])
