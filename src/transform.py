@@ -46,9 +46,9 @@ def validate_weather_data(df):
     assert df["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
-def transform_data(city):
+def transform_data(params):
     #Open json file with the weather data extracted by extract.py
-    with open(f"../data/raw/{city}/raw_weather.json", "r") as f:
+    with open(f"../data/raw/{params['city']}/raw_weather.json", "r") as f:
         data_dict = json.load(f)
 
     hourly = data_dict["hourly"]
@@ -70,6 +70,8 @@ def transform_data(city):
     #Add weather description based on weather code
     hourly_weather["weather_description"] = hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
 
+    hourly_weather["city"] = params["city"]
+
     #Format time column to datetime type, instead of string
     hourly_weather["time"] = pd.to_datetime(hourly_weather["time"], format="%Y-%m-%dT%H:%M")
     hourly_weather = hourly_weather.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered
@@ -83,7 +85,7 @@ def transform_data(city):
     validate_weather_data(hourly_weather)
 
     #Make sure the file path already exist
-    file_path = f"../data/processed/{city}/hourly_weather.json"
+    file_path = f"../data/processed/{params['city']}/hourly_weather.json"
     dir_path = os.path.dirname(file_path)
     os.makedirs(dir_path, exist_ok=True)
 
@@ -102,6 +104,7 @@ def transform_data(city):
         total_precipitation = ("precipitation_mm", "sum"),
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
+    daily_weather["city"] = params["city"]
 
     #Store the aggregate data in a JSON file
-    daily_weather.to_json(f"../data/processed/{city}/daily_weather.json", orient="records", date_format="iso", indent=2)
+    daily_weather.to_json(f"../data/processed/{params['city']}/daily_weather.json", orient="records", date_format="iso", indent=2)

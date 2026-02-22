@@ -9,7 +9,8 @@
     "avg_hum":81.6,
     "avg_precipitation_prob":9.8,
     "total_precipitation":2.2,
-    "max_wind_speed":15.3
+    "max_wind_speed":15.3,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-23T00:00:00.000",
@@ -21,7 +22,8 @@
     "avg_hum":82.1,
     "avg_precipitation_prob":8.4,
     "total_precipitation":0.7,
-    "max_wind_speed":14.8
+    "max_wind_speed":14.8,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-24T00:00:00.000",
@@ -33,7 +35,8 @@
     "avg_hum":81.3,
     "avg_precipitation_prob":22.6,
     "total_precipitation":6.1,
-    "max_wind_speed":12.1
+    "max_wind_speed":12.1,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-25T00:00:00.000",
@@ -45,7 +48,8 @@
     "avg_hum":83.0,
     "avg_precipitation_prob":47.0,
     "total_precipitation":13.3,
-    "max_wind_speed":10.6
+    "max_wind_speed":10.6,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-26T00:00:00.000",
@@ -57,7 +61,8 @@
     "avg_hum":84.4,
     "avg_precipitation_prob":47.7,
     "total_precipitation":6.9,
-    "max_wind_speed":13.4
+    "max_wind_speed":13.4,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-27T00:00:00.000",
@@ -69,7 +74,8 @@
     "avg_hum":86.7,
     "avg_precipitation_prob":14.9,
     "total_precipitation":0.0,
-    "max_wind_speed":14.5
+    "max_wind_speed":14.5,
+    "city":"sao_paulo"
   },
   {
     "time":"2026-02-28T00:00:00.000",
@@ -81,6 +87,7 @@
     "avg_hum":78.0,
     "avg_precipitation_prob":4.3,
     "total_precipitation":0.0,
-    "max_wind_speed":15.7
+    "max_wind_speed":15.7,
+    "city":"sao_paulo"
   }
 ]

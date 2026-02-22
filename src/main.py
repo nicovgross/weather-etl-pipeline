@@ -17,4 +17,4 @@ for city in cities:
     }
 
     extract_data(params)
-    transform_data(city["city"])
+    transform_data(params)

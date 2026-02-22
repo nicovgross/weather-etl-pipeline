@@ -1,7 +1,7 @@
 {
   "latitude": -23.5,
   "longitude": -46.625,
-  "generationtime_ms": 0.15974044799804688,
+  "generationtime_ms": 0.2644062042236328,
   "utc_offset_seconds": -10800,
   "timezone": "America/Sao_Paulo",
   "timezone_abbreviation": "GMT-3",
@@ -16,11 +16,11 @@
     "weathercode": "wmo code"
   },
   "current_weather": {
-    "time": "2026-02-22T16:15",
+    "time": "2026-02-22T16:45",
     "interval": 900,
-    "temperature": 23.6,
-    "windspeed": 14.9,
-    "winddirection": 160,
+    "temperature": 23.3,
+    "windspeed": 14.5,
+    "winddirection": 157,
     "is_day": 1,
     "weathercode": 80
   },
