@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 from datetime import datetime
 
 '''
@@ -51,8 +52,13 @@ def extract_data(params):
         for key, value in raw_data.items():
             raw_weather[f"{key}"] = value[time_index:]
 
+        #Make sure the file path already exist
+        file_path = f"../data/raw/{params['city']}/raw_weather.json"
+        dir_path = os.path.dirname(file_path)
+        os.makedirs(dir_path, exist_ok=True)
+
         #Store the extracted data in a JSON file
-        with open("../data/raw/raw_weather.json", "w") as f:
+        with open(file_path, "w") as f:
             json.dump(raw_weather, f, indent=2)
 
     except requests.exceptions.RequestException as e:
