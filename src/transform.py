@@ -47,14 +47,9 @@ def validate_weather_data(df):
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
 def transform_data(raw_file_path, params):
-    #Open json file with the weather data extracted by extract.py
-    with open(raw_file_path, "r") as f:
-        data_dict = json.load(f)
-
-    hourly = data_dict["hourly"]
+    hourly_weather = pd.read_parquet(raw_file_path)
 
     #Rename columns, detailing units of measurement
-    hourly_weather = pd.DataFrame(hourly)
     hourly_weather.rename(columns={
         "temperature_2m": "temperature_c",
         "apparent_temperature": "apparent_temperature_c",
@@ -85,12 +80,12 @@ def transform_data(raw_file_path, params):
     validate_weather_data(hourly_weather)
 
     #Make sure the file path already exist
-    file_path = f"../data/processed/{params['city']}/hourly_weather.json"
+    file_path = f"../data/processed/{params['city']}/hourly_weather.parquet"
     dir_path = os.path.dirname(file_path)
     os.makedirs(dir_path, exist_ok=True)
 
     #Store the extracted data in a JSON file
-    hourly_weather.to_json(file_path, orient="records", date_format="iso", indent=2)
+    hourly_weather.to_parquet(file_path, index=False)
 
     #Create aggregate dataframe with relevant metrics
     daily_weather = hourly_weather.set_index("time").resample("D").agg(
@@ -107,4 +102,4 @@ def transform_data(raw_file_path, params):
     daily_weather["city"] = params["city"]
 
     #Store the aggregate data in a JSON file
-    daily_weather.to_json(f"../data/processed/{params['city']}/daily_weather.json", orient="records", date_format="iso", indent=2)
+    daily_weather.to_parquet(f"../data/processed/{params['city']}/daily_weather.parquet", index=False)

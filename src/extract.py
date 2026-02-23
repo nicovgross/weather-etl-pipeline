@@ -1,7 +1,7 @@
 import requests
+import pandas as pd
 import json
 import os
-from datetime import datetime
 
 '''
 This program extracts raw data from the Open-Meteo API, 
@@ -24,16 +24,15 @@ def extract_data(params):
 
         #Parse the JSON response into a Python dictionary
         data = response.json()
+        hourly = pd.DataFrame(data["hourly"])
         date = data["current_weather"]["time"][:10] #Get current date
 
         #Make sure the file path already exist
-        raw_file_path = f"../data/raw/{params['city']}/{date}.json"
+        raw_file_path = f"../data/raw/{params['city']}/{date}.parquet"
         dir_path = os.path.dirname(raw_file_path)
         os.makedirs(dir_path, exist_ok=True)
 
-        #Store the extracted data in a JSON file
-        with open(raw_file_path, "w") as f:
-            json.dump(data, f, indent=2)
+        hourly.to_parquet(raw_file_path, index=False)
 
         return raw_file_path
 
