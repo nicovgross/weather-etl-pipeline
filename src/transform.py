@@ -90,6 +90,7 @@ def transform_data(raw_file_path, params):
 
     hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
     hourly_weather.drop_duplicates(subset=["time", "city"], inplace=True) #Make sure there are no duplicates
+    hourly_weather.sort_values(by="time")
 
     write(hourly_file_path, hourly_weather)
 
@@ -117,5 +118,6 @@ def transform_data(raw_file_path, params):
 
     daily_weather = pd.concat([daily_weather, new_daily_weather], axis=0)
     daily_weather.drop_duplicates(subset=["time", "city"], inplace=True)
+    daily_weather.sort_values(by="time")
 
     write(daily_file_path, daily_weather)
