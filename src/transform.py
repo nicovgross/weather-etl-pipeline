@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-import json
+from fastparquet import write
 
 WEATHER_CODE_MAP = {
         0: "Clear sky",
@@ -47,10 +47,10 @@ def validate_weather_data(df):
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
 def transform_data(raw_file_path, params):
-    hourly_weather = pd.read_parquet(raw_file_path)
+    new_hourly_weather = pd.read_parquet(raw_file_path) #Read data extracted py API
 
     #Rename columns, detailing units of measurement
-    hourly_weather.rename(columns={
+    new_hourly_weather.rename(columns={
         "temperature_2m": "temperature_c",
         "apparent_temperature": "apparent_temperature_c",
         "relative_humidity_2m": "relative_humidity_%",
@@ -63,32 +63,39 @@ def transform_data(raw_file_path, params):
     }, inplace=True)
 
     #Add weather description based on weather code
-    hourly_weather["weather_description"] = hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
+    new_hourly_weather["weather_description"] = new_hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
 
-    hourly_weather["city"] = params["city"]
+    new_hourly_weather["city"] = params["city"]
 
     #Format time column to datetime type, instead of string
-    hourly_weather["time"] = pd.to_datetime(hourly_weather["time"], format="%Y-%m-%dT%H:%M")
-    hourly_weather = hourly_weather.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered
+    new_hourly_weather["time"] = pd.to_datetime(new_hourly_weather["time"], format="%Y-%m-%dT%H:%M")
+    new_hourly_weather = new_hourly_weather.sort_values("time").reset_index(drop=True) #Make sure all rows are oredered by time
 
     #Separate time column into different columns
-    hourly_weather["year"] = hourly_weather["time"].dt.year
-    hourly_weather["month"] = hourly_weather["time"].dt.month
-    hourly_weather["day"] = hourly_weather["time"].dt.day
-    hourly_weather["hour"] = hourly_weather["time"].dt.hour
+    new_hourly_weather["year"] = new_hourly_weather["time"].dt.year
+    new_hourly_weather["month"] = new_hourly_weather["time"].dt.month
+    new_hourly_weather["day"] = new_hourly_weather["time"].dt.day
+    new_hourly_weather["hour"] = new_hourly_weather["time"].dt.hour
 
-    validate_weather_data(hourly_weather)
+    validate_weather_data(new_hourly_weather)
 
-    #Make sure the file path already exist
-    file_path = f"../data/processed/{params['city']}/hourly_weather.parquet"
-    dir_path = os.path.dirname(file_path)
-    os.makedirs(dir_path, exist_ok=True)
+    #Read cumulative hourly data
+    hourly_weather = pd.DataFrame()
+    hourly_file_path = f"../data/processed/hourly_weather.parquet"
+    if os.path.isfile(hourly_file_path): 
+        hourly_weather = pd.read_parquet(hourly_file_path)
+    else:
+        dir_path = os.path.dirname(hourly_file_path)
+        os.makedirs(dir_path, exist_ok=True)
 
-    #Store the extracted data in a JSON file
-    hourly_weather.to_parquet(file_path, index=False)
+    hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
+    hourly_weather.drop_duplicates(subset=["time", "city"], inplace=True) #Make sure there are no duplicates
+
+    write(hourly_file_path, hourly_weather)
 
     #Create aggregate dataframe with relevant metrics
-    daily_weather = hourly_weather.set_index("time").resample("D").agg(
+    daily_weather = pd.DataFrame()
+    new_daily_weather = new_hourly_weather.set_index("time").resample("D").agg(
         avg_temp = ("temperature_c", "mean"),
         min_temp = ("temperature_c", "min"),
         max_temp = ("temperature_c", "max"),
@@ -99,7 +106,16 @@ def transform_data(raw_file_path, params):
         total_precipitation = ("precipitation_mm", "sum"),
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
-    daily_weather["city"] = params["city"]
+    new_daily_weather["city"] = params["city"]
 
-    #Store the aggregate data in a JSON file
-    daily_weather.to_parquet(f"../data/processed/{params['city']}/daily_weather.parquet", index=False)
+    daily_file_path = f"../data/processed/daily_weather.parquet"
+    if os.path.isfile(daily_file_path):    
+        daily_weather = pd.read_parquet(daily_file_path)
+    else:
+        dir_path = os.path.dirname(daily_file_path)
+        os.makedirs(dir_path, exist_ok=True)
+
+    daily_weather = pd.concat([daily_weather, new_daily_weather], axis=0)
+    daily_weather.drop_duplicates(subset=["time", "city"], inplace=True)
+
+    write(daily_file_path, daily_weather)
