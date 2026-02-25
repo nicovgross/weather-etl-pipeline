@@ -65,7 +65,7 @@ def transform_data(raw_file_path, params):
     #Add weather description based on weather code
     new_hourly_weather["weather_description"] = new_hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
 
-    new_hourly_weather["city"] = params["city"]
+    new_hourly_weather["city_name"] = params["city_name"]
 
     #Format time column to datetime type, instead of string
     new_hourly_weather["time"] = pd.to_datetime(new_hourly_weather["time"], format="%Y-%m-%dT%H:%M")
@@ -89,7 +89,7 @@ def transform_data(raw_file_path, params):
         os.makedirs(dir_path, exist_ok=True)
 
     hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
-    hourly_weather.drop_duplicates(subset=["time", "city"], inplace=True) #Make sure there are no duplicates
+    hourly_weather.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
     hourly_weather.sort_values(by="time")
 
     write(hourly_file_path, hourly_weather)
@@ -107,7 +107,7 @@ def transform_data(raw_file_path, params):
         total_precipitation = ("precipitation_mm", "sum"),
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
-    new_daily_weather["city"] = params["city"]
+    new_daily_weather["city_name"] = params["city_name"]
 
     daily_file_path = f"../data/processed/daily_weather.parquet"
     if os.path.isfile(daily_file_path):    
@@ -117,7 +117,7 @@ def transform_data(raw_file_path, params):
         os.makedirs(dir_path, exist_ok=True)
 
     daily_weather = pd.concat([daily_weather, new_daily_weather], axis=0)
-    daily_weather.drop_duplicates(subset=["time", "city"], inplace=True)
+    daily_weather.drop_duplicates(subset=["time", "city_name"], inplace=True)
     daily_weather.sort_values(by="time")
 
     write(daily_file_path, daily_weather)

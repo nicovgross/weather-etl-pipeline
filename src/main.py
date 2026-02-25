@@ -7,7 +7,7 @@ with open("../config/cities.json", "r") as f:
 
 for city in cities:
     params = { #Define parameters
-        "city": city["city"],
+        "city_name": city["city_name"],
         "latitude": city["latitude"],
         "longitude": city["longitude"],
         "hourly": ["temperature_2m", "apparent_temperature", "relative_humidity_2m", "precipitation_probability",
