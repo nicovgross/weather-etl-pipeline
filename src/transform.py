@@ -39,12 +39,13 @@ def validate_weather_data(df):
     #Assert there are no absurd values
     assert df["temperature_c"].between(-89.2, 56.7).all(), "Inconsistent temperature detected"
     assert df["apparent_temperature_c"].between(-89.2, 56.7).all(), "Inconsistent apparent temperature detected"
-    assert df["relative_humidity_%"].between(0,100).all(), "Inconsistent relative humidity detected"
-    assert df["precipitation_probability_%"].between(0,100).all(), "Inconsistent precipitation probability detected"
+    assert df["relative_humidity_pct"].between(0,100).all(), "Inconsistent relative humidity detected"
+    assert df["precipitation_probability_pct"].between(0,100).all(), "Inconsistent precipitation probability detected"
     assert df["precipitation_mm"].ge(0).all(), "Inconsistent precipitation detected"
     assert df["wind_speed_kmh"].between(0,408).all(), "Inconsistent wind speed detected detected"
     assert df["wind_direction_deg"].between(0,360).all(), "Inconsistent wind direction detected"
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
+    assert df["cloud_cover_pct"].between(0,100).all(), "Inconsistent precipitation probability detected"
 
 def transform_data(raw_file_path, params):
     new_hourly_weather = pd.read_parquet(raw_file_path) #Read data extracted by the API
@@ -53,13 +54,13 @@ def transform_data(raw_file_path, params):
     new_hourly_weather.rename(columns={
         "temperature_2m": "temperature_c",
         "apparent_temperature": "apparent_temperature_c",
-        "relative_humidity_2m": "relative_humidity_%",
-        "precipitation_probability": "precipitation_probability_%",
+        "relative_humidity_2m": "relative_humidity_pct",
+        "precipitation_probability": "precipitation_probability_pct",
         "precipitation": "precipitation_mm",
         "windspeed_10m": "wind_speed_kmh",
         "winddirection_10m": "wind_direction_deg",
         "weathercode": "weather_code", 
-        "cloudcover": "cloud_cover_%"
+        "cloudcover": "cloud_cover_pct"
     }, inplace=True)
 
     #Add weather description based on weather code
@@ -87,8 +88,8 @@ def transform_data(raw_file_path, params):
         max_temp = ("temperature_c", "max"),
         temp_range = ("temperature_c", lambda x: x.max() - x.min()),
         avg_app_temp = ("apparent_temperature_c", "mean"),
-        avg_hum = ("relative_humidity_%", "mean"),
-        avg_precipitation_prob = ("precipitation_probability_%", "mean"),
+        avg_hum = ("relative_humidity_pct", "mean"),
+        avg_precipitation_prob = ("precipitation_probability_pct", "mean"),
         total_precipitation = ("precipitation_mm", "sum"),
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
