@@ -1,12 +1,16 @@
 [
   {
     "city_name": "rio_de_janeiro",
+    "state": "rio_de_janeiro",
+    "country": "brazil",
     "latitude": -22.9068,
     "longitude": -43.1729,
     "timezone": "America/Sao_Paulo"
   },
   {
     "city_name": "sao_paulo",
+    "state": "sao_paulo",
+    "country": "brazil",
     "latitude": -23.5505,
     "longitude": -46.6333,
     "timezone": "America/Sao_Paulo"
