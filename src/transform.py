@@ -47,7 +47,7 @@ def validate_weather_data(df):
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
 
 def transform_data(raw_file_path, params):
-    new_hourly_weather = pd.read_parquet(raw_file_path) #Read data extracted py API
+    new_hourly_weather = pd.read_parquet(raw_file_path) #Read data extracted by the API
 
     #Rename columns, detailing units of measurement
     new_hourly_weather.rename(columns={
@@ -79,21 +79,6 @@ def transform_data(raw_file_path, params):
 
     validate_weather_data(new_hourly_weather)
 
-    #Read cumulative hourly data
-    hourly_weather = pd.DataFrame()
-    hourly_file_path = f"../data/processed/hourly_weather.parquet"
-    if os.path.isfile(hourly_file_path): 
-        hourly_weather = pd.read_parquet(hourly_file_path)
-    else:
-        dir_path = os.path.dirname(hourly_file_path)
-        os.makedirs(dir_path, exist_ok=True)
-
-    hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
-    hourly_weather.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
-    hourly_weather.sort_values(by="time")
-
-    write(hourly_file_path, hourly_weather)
-
     #Create aggregate dataframe with relevant metrics
     daily_weather = pd.DataFrame()
     new_daily_weather = new_hourly_weather.set_index("time").resample("D").agg(
@@ -108,6 +93,23 @@ def transform_data(raw_file_path, params):
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
     new_daily_weather["city_name"] = params["city_name"]
+
+    new_hourly_weather = new_hourly_weather.drop(columns=["year","month","day","hour"]) #Remove data only used in calculations
+
+    #Read cumulative hourly data
+    hourly_weather = pd.DataFrame()
+    hourly_file_path = f"../data/processed/hourly_weather.parquet"
+    if os.path.isfile(hourly_file_path): 
+        hourly_weather = pd.read_parquet(hourly_file_path)
+    else:
+        dir_path = os.path.dirname(hourly_file_path)
+        os.makedirs(dir_path, exist_ok=True)
+
+    hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
+    hourly_weather.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
+    hourly_weather.sort_values(by="time")
+
+    write(hourly_file_path, hourly_weather)
 
     daily_file_path = f"../data/processed/daily_weather.parquet"
     if os.path.isfile(daily_file_path):    
