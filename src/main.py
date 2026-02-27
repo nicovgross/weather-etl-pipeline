@@ -1,5 +1,6 @@
 from extract import *
 from transform import *
+from load import *
 import json
 
 with open("../config/cities.json", "r") as f:
@@ -18,3 +19,4 @@ for city in cities:
 
     raw_file_path = extract_data(params)
     transform_data(raw_file_path, params)
+    load_data()
