@@ -34,7 +34,7 @@ cursor = conn.cursor()
 #Create dimension table city
 cursor.execute("""CREATE TABLE IF NOT EXISTS dim_city(
                 city_id SERIAL PRIMARY KEY,
-                city_name TEXT NOT NULL,
+                city_name TEXT NOT NULL UNIQUE,
                 state TEXT,
                 country TEXT,
                 latitude DOUBLE PRECISION,
