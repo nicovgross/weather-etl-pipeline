@@ -27,7 +27,7 @@ def extract_data(params):
         date = data["current_weather"]["time"][:10] #Get current date
 
         #Make sure the file path already exist
-        raw_file_path = f"../data/raw/{params['city_name']}/{date}.parquet"
+        raw_file_path = f"data/raw/{params['city_name']}/{date}.parquet"
         dir_path = os.path.dirname(raw_file_path)
         os.makedirs(dir_path, exist_ok=True)
 

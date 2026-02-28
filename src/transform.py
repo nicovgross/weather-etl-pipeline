@@ -99,7 +99,7 @@ def transform_data(raw_file_path, params):
 
     #Read cumulative hourly data
     hourly_weather = pd.DataFrame()
-    hourly_file_path = f"../data/processed/hourly_weather.parquet"
+    hourly_file_path = f"data/processed/hourly_weather.parquet"
     if os.path.isfile(hourly_file_path): 
         hourly_weather = pd.read_parquet(hourly_file_path)
     else:
@@ -112,7 +112,7 @@ def transform_data(raw_file_path, params):
 
     write(hourly_file_path, hourly_weather)
 
-    daily_file_path = f"../data/processed/daily_weather.parquet"
+    daily_file_path = f"data/processed/daily_weather.parquet"
     if os.path.isfile(daily_file_path):    
         daily_weather = pd.read_parquet(daily_file_path)
     else:

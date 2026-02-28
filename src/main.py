@@ -3,7 +3,7 @@ from transform import *
 from load import *
 import json
 
-with open("../config/cities.json", "r") as f:
+with open("config/cities.json", "r") as f:
     cities = json.load(f)
 
 for city in cities:
