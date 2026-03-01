@@ -63,7 +63,7 @@ def validate_weather_data(df):
     assert df["weather_code"].isin(WEATHER_CODE_MAP.keys()).all(), "Inconsistent weather code detected"
     assert df["cloud_cover_pct"].between(0,100).all(), "Inconsistent precipitation probability detected"
 
-def transform_data(raw_file_path, params):
+def transform_data(raw_file_path, city_name):
     new_hourly_weather = pd.read_parquet(raw_file_path) #Read data extracted by the API
 
     #Rename columns, detailing units of measurement
@@ -82,7 +82,7 @@ def transform_data(raw_file_path, params):
     #Add weather description based on weather code
     new_hourly_weather["weather_description"] = new_hourly_weather["weather_code"].map(WEATHER_CODE_MAP)
 
-    new_hourly_weather["city_name"] = params["city_name"]
+    new_hourly_weather["city_name"] = city_name
 
     #Format time column to datetime type, instead of string
     new_hourly_weather["time"] = pd.to_datetime(new_hourly_weather["time"], format="%Y-%m-%dT%H:%M")
@@ -108,7 +108,7 @@ def transform_data(raw_file_path, params):
         total_precipitation = ("precipitation_mm", "sum"),
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
-    new_daily_weather["city_name"] = params["city_name"]
+    new_daily_weather["city_name"] = city_name
     new_daily_weather["year"] = new_daily_weather["time"].dt.year
     new_daily_weather["month"] = new_daily_weather["time"].dt.month
 
