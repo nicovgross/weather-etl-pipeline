@@ -31,6 +31,22 @@ WEATHER_CODE_MAP = {
         99: "Thunderstorm with heavy hail"
     }
 
+#Store the new data in specified path
+def store_processed_data(path, new_data_df):
+    accumulated_data = pd.DataFrame()
+    if os.path.isfile(path): 
+        accumulated_data = pd.read_parquet(path)
+    else:
+        dir_path = os.path.dirname(path)
+        os.makedirs(dir_path, exist_ok=True)
+
+    new_data_df = new_data_df.drop(columns=["year","month","day","hour"], errors="ignore") #Remove data only used in calculations
+    accumulated_data = pd.concat([accumulated_data, new_data_df], axis=0) #Adds new data to table
+    accumulated_data.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
+    accumulated_data = accumulated_data.sort_values(by="time")
+
+    write(path, accumulated_data)
+
 def validate_weather_data(df):
     #Check null values
     for column in df.columns:
@@ -81,7 +97,6 @@ def transform_data(raw_file_path, params):
     validate_weather_data(new_hourly_weather)
 
     #Create aggregate dataframe with relevant metrics
-    daily_weather = pd.DataFrame()
     new_daily_weather = new_hourly_weather.set_index("time").resample("D").agg(
         avg_temp = ("temperature_c", "mean"),
         min_temp = ("temperature_c", "min"),
@@ -94,33 +109,15 @@ def transform_data(raw_file_path, params):
         max_wind_speed = ("wind_speed_kmh", "max")
     ).round(1).reset_index()
     new_daily_weather["city_name"] = params["city_name"]
+    new_daily_weather["year"] = new_daily_weather["time"].dt.year
+    new_daily_weather["month"] = new_daily_weather["time"].dt.month
 
-    new_hourly_weather = new_hourly_weather.drop(columns=["year","month","day","hour"]) #Remove data only used in calculations
+    for (year, month), group_df in new_hourly_weather.groupby(["year", "month"]):
+        hourly_path = f"data/processed/hourly_weather/{year}/{month:02d}/data.parquet"
+        store_processed_data(hourly_path, group_df)
+ 
+    for (year, month), group_df in new_daily_weather.groupby(["year", "month"]):
+        daily_path = f"data/processed/daily_weather/{year}/{month:02d}/data.parquet"
+        store_processed_data(daily_path, group_df)
 
-    #Read cumulative hourly data
-    hourly_weather = pd.DataFrame()
-    hourly_file_path = f"data/processed/hourly_weather.parquet"
-    if os.path.isfile(hourly_file_path): 
-        hourly_weather = pd.read_parquet(hourly_file_path)
-    else:
-        dir_path = os.path.dirname(hourly_file_path)
-        os.makedirs(dir_path, exist_ok=True)
-
-    hourly_weather = pd.concat([hourly_weather, new_hourly_weather], axis=0) #Adds new data to table
-    hourly_weather.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
-    hourly_weather.sort_values(by="time")
-
-    write(hourly_file_path, hourly_weather)
-
-    daily_file_path = f"data/processed/daily_weather.parquet"
-    if os.path.isfile(daily_file_path):    
-        daily_weather = pd.read_parquet(daily_file_path)
-    else:
-        dir_path = os.path.dirname(daily_file_path)
-        os.makedirs(dir_path, exist_ok=True)
-
-    daily_weather = pd.concat([daily_weather, new_daily_weather], axis=0)
-    daily_weather.drop_duplicates(subset=["time", "city_name"], inplace=True)
-    daily_weather.sort_values(by="time")
-
-    write(daily_file_path, daily_weather)
+    return hourly_path, daily_path

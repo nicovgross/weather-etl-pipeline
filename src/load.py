@@ -2,9 +2,9 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
-def load_data():
-    df_hourly_weather = pd.read_parquet("data/processed/hourly_weather.parquet")
-    df_daily_weather = pd.read_parquet("data/processed/daily_weather.parquet")
+def load_data(hourly_path, daily_path):
+    df_hourly_weather = pd.read_parquet(hourly_path)
+    df_daily_weather = pd.read_parquet(daily_path)
     df_cities = pd.read_json("config/cities.json")
 
     #Connect to database

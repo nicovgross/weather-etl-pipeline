@@ -18,5 +18,5 @@ for city in cities:
     }
 
     raw_file_path = extract_data(params)
-    transform_data(raw_file_path, params)
-    load_data()
+    hourly_path, daily_path = transform_data(raw_file_path, params)
+    load_data(hourly_path, daily_path)
