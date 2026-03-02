@@ -2,3 +2,4 @@ requests
 pandas
 fastparquet
 psycopg2
+streamlit
