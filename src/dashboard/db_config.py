@@ -6,7 +6,7 @@ def get_engine():
     password = os.getenv("POSTGRES_PASSWORD")
     host = os.getenv("POSTGRES_HOST", "localhost")
     port = os.getenv("POSTGRES_PORT", "5432")
-    database = os.getenv("POSTGRES_DB")
+    database = os.getenv("POSTGRES_DB", "weather_db")
 
     connection_string = (
         f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"

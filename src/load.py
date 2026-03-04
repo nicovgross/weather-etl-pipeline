@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import psycopg2
 from psycopg2.extras import execute_values
 
@@ -9,11 +10,11 @@ def load_data(hourly_path, daily_path):
 
     #Connect to database
     conn = psycopg2.connect(
-        dbname="weather_db",
-        user="postgres",
-        password="etl2026",
-        host="localhost",
-        port="5432"
+        dbname=os.getenv("POSTGRES_DB", "weather_db"),
+        user=os.getenv("POSTGRES_USER"),
+        password=os.getenv("POSTGRES_PASSWORD"),
+        host=os.getenv("POSTGRES_HOST", "localhost"),
+        port=os.getenv("POSTGRES_PORT", "5432")
     )
     conn.autocommit=True
     cursor = conn.cursor()

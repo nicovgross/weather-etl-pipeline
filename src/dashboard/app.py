@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from src.dashboard.db_config import get_engine
+from db_config import get_engine
 
 st.set_page_config(page_title="Weather Dashboard", layout="wide")
 

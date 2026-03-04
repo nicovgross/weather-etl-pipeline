@@ -1,12 +1,13 @@
 import psycopg2
+import os
 
 #Connect to database
 conn = psycopg2.connect(
     dbname="postgres",
-    user="postgres",
-    password="etl2026",
-    host="localhost",
-    port="5432"
+    user=os.getenv("POSTGRES_USER"),
+    password=os.getenv("POSTGRES_PASSWORD"),
+    host=os.getenv("POSTGRES_HOST", "localhost"),
+    port=os.getenv("POSTGRES_PORT", "5432")
 )
 
 conn.autocommit=True
@@ -21,11 +22,11 @@ cursor.close()
 conn.close()
 
 conn = psycopg2.connect(
-    dbname="weather_db",
-    user="postgres",
-    password="etl2026",
-    host="localhost",
-    port="5432"
+    dbname=os.getenv("POSTGRES_DB", "weather_db"),
+    user=os.getenv("POSTGRES_USER"),
+    password=os.getenv("POSTGRES_PASSWORD"),
+    host=os.getenv("POSTGRES_HOST", "localhost"),
+    port=os.getenv("POSTGRES_PORT", "5432")
 )
 
 conn.autocommit=True
