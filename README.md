@@ -70,4 +70,5 @@ An interactive Streamlit dashboard was built to visualize the weather data store
 To run the dashboard:
 ```bash
 streamlit run src/dashboard/app.py
-``` 
+```
+<img width="993" height="738" alt="image" src="https://github.com/user-attachments/assets/795516c0-f334-4d3c-9689-da71f1875ee1" />
