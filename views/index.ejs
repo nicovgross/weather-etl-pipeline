@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <title>Weather</title>
 </head>
 <body>
-    <h1>Hello motherfucker</h1>
+    <div class="today">
+        <form class = "searchBar" action = "/search" method = "post">
+            <input type="text" name="city_name" placeholder="Search city" autofocus="true"/><br />
+            <button class="add" type="submit" name="list">Search</button>
+        </form>
+    </div>
+    <div class="forecast"></div>
 </body>
 </html>
