@@ -20,6 +20,24 @@ const db = new pg.Client({
 });
 db.connect();
 
+const doNotCapitalize = ["de", "da", "do"]
+
+function formatCityName(city_name) {
+    const new_name = city_name.replaceAll("_", " ");
+    return new_name.split(' ')                          
+    .map(word => doNotCapitalize.includes(word.toLowerCase()) 
+    ? word.toLowerCase() 
+    : (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()))
+    .join(' ');
+}
+
+const cities = {};
+const result = await db.query("SELECT DISTINCT city_name FROM dim_city");
+const rows = result.rows;
+for(let row of rows) {
+    cities[formatCityName(row.city_name)] = row.city_name;
+}
+
 const query = "SELECT time, avg_temp, city_name FROM daily_weather d JOIN dim_city c ON d.city_id = c.city_id WHERE city_name = $1"
 
 async function getCity(city_name) {
@@ -29,13 +47,14 @@ async function getCity(city_name) {
 }
 
 app.get("/", (req, res) => {
-    res.render("index.ejs");
+    res.render("index.ejs", {citiesList : cities});
 });
 
 app.post("/search", async (req, res) => {
     try {
-        const city_name = req.body.city_name
-        await getCity(city_name);
+        const city_name = req.body.city_name;
+        const city_name_db = cities[city_name];
+        await getCity(city_name_db);
     } catch(err) {
         console.log(err)
     }
