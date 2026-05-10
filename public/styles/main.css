@@ -1,7 +1,254 @@
-.today {
-    font-size: small;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-.forecast {
-    font-size: large;
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f4f4;
+
+    display:flex;
+
+    min-height:100vh;
+
+    padding:20px;
+    gap:20px;
+}
+
+/* =========================
+    SIDEBAR
+========================= */
+
+.sidebar{
+    width:250px;
+    background:white;
+
+    border:2px solid black;
+
+    padding:20px;
+}
+
+.searchBar{
+    display:flex;
+    align-items:center;
+
+    border:2px solid black;
+    border-radius:40px;
+
+    overflow:hidden;
+}
+
+.searchBar input{
+    flex:1;
+
+    border:none;
+    outline:none;
+
+    padding:10px 15px;
+
+    font-size:1rem;
+}
+
+.searchBar button{
+    border:none;
+    background:white;
+
+    padding:8px 12px;
+
+    cursor:pointer;
+}
+
+/* =========================
+    MAIN CONTENT
+========================= */
+
+.mainContent{
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:20px;
+}
+
+/* =========================
+    CARDS
+========================= */
+
+.todayCard,
+.forecastCard{
+    background:white;
+
+    border:2px solid black;
+
+    padding:25px;
+}
+
+.cardHeader{
+    margin-bottom:20px;
+}
+
+.sectionLabel{
+    font-size:.9rem;
+    color:#666;
+}
+
+/* =========================
+    WEATHER MAIN
+========================= */
+
+.weatherMain{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:25px;
+}
+
+.tempRow{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.tempRow h1{
+    font-size:4rem;
+}
+
+.weatherIcon{
+    font-size:4rem;
+}
+
+.weatherInfo{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+
+    font-size:1.2rem;
+}
+
+.minMax{
+    display:flex;
+    gap:30px;
+}
+
+/* =========================
+    TABS
+========================= */
+
+.weatherTabs{
+    display:flex;
+    gap:10px;
+
+    margin-bottom:20px;
+}
+
+.weatherTabs button{
+    border:2px solid black;
+    background:white;
+
+    padding:8px 15px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+}
+
+.weatherTabs button.active{
+    background:black;
+    color:white;
+}
+
+/* =========================
+    CHART
+========================= */
+
+.chartContainer{
+    margin-bottom:25px;
+}
+
+.chartPlaceholder{
+    height:200px;
+
+    border-left:3px solid black;
+    border-bottom:3px solid black;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#888;
+}
+
+/* =========================
+    METRICS
+========================= */
+
+.metrics{
+    display:flex;
+    justify-content:space-between;
+
+    gap:20px;
+}
+
+.metric{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.metric span{
+    font-size:.9rem;
+    color:#666;
+}
+
+.metric strong{
+    font-size:1.2rem;
+}
+
+/* =========================
+    FORECAST
+========================= */
+
+.forecastCard{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.forecastItem{
+    border-bottom:2px solid #ddd;
+
+    padding-bottom:20px;
+}
+
+.forecastHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.forecastLeft{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.forecastTemp{
+    font-size:2rem;
+}
+
+.forecastIcon{
+    font-size:2rem;
+}
+
+.forecastRight{
+    display:flex;
+    align-items:center;
+    gap:30px;
+}
+
+.forecastDetails{
+    margin-top:20px;
 }

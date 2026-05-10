@@ -7,22 +7,279 @@
     <title>Weather</title>
 </head>
 <body>
-    <div class="today">
-        <form class = "searchBar" action = "/search" method = "post">
-            <input type="text" name="city_name" placeholder="Search city" autofocus="true"/><br />
-            <button class="add" type="submit" name="list">Search</button>
+
+    <aside class="sidebar">
+
+        <form class="searchBar" action="/search" method="post">
+
+            <input list="cities" name="city_name" placeholder="Select location" />
+            <datalist id="cities">
+                <% for(let city of Object.values(citiesList)) {%>
+                    <option value="<%= city %>">
+                <% } %>
+            </datalist>
+
         </form>
-    </div>
 
-    <form class = "searchBar" action = "/search" method = "post">
-        <input list="cities" name="city_name" placeholder="Select location" />
-        <datalist id="cities">
-            <% for(let city of Object.values(citiesList)) {%>
-                <option value="<%= city %>">
-            <% } %>
-        </datalist>
-    </form>
+    </aside>
+    
+    <main class="mainContent">
 
-    <div class="forecast"></div>
+        <!-- =========================
+            TODAY WEATHER
+        ========================== -->
+
+        <section class="todayCard">
+
+            <!-- Header -->
+            <div class="cardHeader">
+                <div>
+                    <p class="sectionLabel">Sat</p>
+                    <h2>02/05</h2>
+                </div>
+            </div>
+
+            <!-- Main Weather -->
+            <div class="weatherMain">
+
+                <!-- Left -->
+                <div class="currentTemp">
+
+                    <div class="tempRow">
+                        <h1>26°</h1>
+
+                        <div class="weatherIcon">
+                            ☀️
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right -->
+                <div class="weatherInfo">
+
+                    <div class="minMax">
+                        <div>
+                            <span>min</span>
+                            <strong>21°</strong>
+                        </div>
+
+                        <div>
+                            <span>max</span>
+                            <strong>29°</strong>
+                        </div>
+                    </div>
+
+                    <div class="rainChance">
+                        💧 21%
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Tabs -->
+            <div class="weatherTabs">
+                <button class="active">temp</button>
+                <button>rain(%)</button>
+                <button>rain(mm)</button>
+            </div>
+
+            <!-- Graph -->
+            <div class="chartContainer">
+
+                <div class="chartPlaceholder">
+                    Chart Here
+                </div>
+
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics">
+
+                <div class="metric">
+                    <span>Apparent Temp</span>
+                    <strong>28°</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Humidity</span>
+                    <strong>50%</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Wind Speed</span>
+                    <strong>20 km/h</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Cloud Cover</span>
+                    <strong>30%</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+            FORECAST SECTION
+        ========================== -->
+
+        <section class="forecastCard">
+
+            <!-- Forecast Day -->
+            <div class="forecastItem expanded">
+
+                <div class="forecastHeader">
+
+                    <div class="forecastLeft">
+
+                        <h3>Sun</h3>
+
+                        <div class="forecastTemp">
+                            26°
+                        </div>
+
+                        <div class="forecastIcon">
+                            ☀️
+                        </div>
+
+                    </div>
+
+                    <div class="forecastRight">
+
+                        <div class="forecastMinMax">
+                            <span>min</span>
+                            <strong>21°</strong>
+
+                            <span>max</span>
+                            <strong>29°</strong>
+                        </div>
+
+                        <div class="forecastRain">
+                            💧 21%
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Expanded content -->
+                <div class="forecastDetails">
+
+                    <div class="weatherTabs">
+                        <button class="active">temp</button>
+                        <button>rain(%)</button>
+                        <button>rain(mm)</button>
+                    </div>
+
+                    <div class="chartContainer">
+
+                        <div class="chartPlaceholder">
+                            Chart Here
+                        </div>
+
+                    </div>
+
+                    <div class="metrics">
+
+                        <div class="metric">
+                            <span>Apparent Temp</span>
+                            <strong>28°</strong>
+                        </div>
+
+                        <div class="metric">
+                            <span>Humidity</span>
+                            <strong>50%</strong>
+                        </div>
+
+                        <div class="metric">
+                            <span>Wind Speed</span>
+                            <strong>20 km/h</strong>
+                        </div>
+
+                        <div class="metric">
+                            <span>Cloud Cover</span>
+                            <strong>30%</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Other Days -->
+            <div class="forecastItem collapsed">
+
+                <div class="forecastHeader">
+
+                    <div class="forecastLeft">
+
+                        <h3>Mon</h3>
+
+                        <div class="forecastTemp">
+                            26°
+                        </div>
+
+                        <div class="forecastIcon">
+                            ☀️
+                        </div>
+
+                    </div>
+
+                    <div class="forecastRight">
+
+                        <div class="forecastMinMax">
+                            <span>21° / 29°</span>
+                        </div>
+
+                        <div class="forecastRain">
+                            💧 21%
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="forecastItem collapsed">
+
+                <div class="forecastHeader">
+
+                    <div class="forecastLeft">
+
+                        <h3>Tue</h3>
+
+                        <div class="forecastTemp">
+                            26°
+                        </div>
+
+                        <div class="forecastIcon">
+                            ☀️
+                        </div>
+
+                    </div>
+
+                    <div class="forecastRight">
+
+                        <div class="forecastMinMax">
+                            <span>21° / 29°</span>
+                        </div>
+
+                        <div class="forecastRain">
+                            💧 21%
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 </body>
 </html>
