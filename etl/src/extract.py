@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import os
+import logging
 
 '''
 This program extracts raw data from the Open-Meteo API, 
@@ -24,6 +25,7 @@ def extract_data(params):
         #Parse the JSON response into a Python dictionary
         data = response.json()
         hourly = pd.DataFrame(data["hourly"])
+        num_records = len(hourly)
         date = data["current_weather"]["time"][:10] #Get current date
 
         #Make sure the file path already exist
@@ -33,7 +35,7 @@ def extract_data(params):
 
         hourly.to_parquet(raw_file_path, index=False)
 
-        return raw_file_path
+        return raw_file_path, num_records
 
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
