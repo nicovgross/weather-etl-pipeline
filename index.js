@@ -52,20 +52,46 @@ const WeekDayMap = new Map(
   WeekDay.map(day => [day.index, day])
 );
 
+const WEATHER_EMOJI = [
+    {description : "Mainly clear", emoji : "🌤️"},
+    {description : "Clear sky", emoji : "☀️"},
+    {description : "Partly cloudy", emoji : "⛅"},
+    {description : "Overcast", emoji : "☁️"},
+    {description : "Depositing rime fog", emoji : "🌫️"},
+    {description : "Fog", emoji : "🌫️"},
+    {description : "Light drizzle", emoji : "🌦️"},
+    {description : "Moderate drizzle", emoji : "🌦️"},
+    {description : "Dense drizzle", emoji : "🌧️"},
+    {description : "Light rain", emoji : "🌦️"},
+    {description : "Moderate rain", emoji : "🌧️"},
+    {description : "Heavy rain", emoji : "🌧️"},
+    {description : "Light freezing rain", emoji : "🧊🌧️"},
+    {description : "Heavy freezing rain", emoji : "🧊🌧️"},
+    {description : "Light snow", emoji : "🌨️"},
+    {description : "Moderate snow", emoji : "🌨️"},
+    {description : "Heavy snow", emoji : "❄️"},
+    {description : "Snow grains", emoji : "❄️"},
+    {description : "LightRain showers", emoji : "🌦️"},
+    {description : "Moderate rain shower", emoji : "🌧️"},
+    {description : "Heavy rain shower", emoji : "⛈️"},
+    {description : "Light snow shower", emoji : "🌨️"},
+    {description : "Heavy snow shower", emoji : "❄️🌨️"},
+    {description : "Thunderstorm", emoji : "⛈️"},
+    {description : "Thunderstorm with heavy hail", emoji : "⛈️🧊"}
+];
+
+const WeatherEmojiMap = new Map(
+  WEATHER_EMOJI.map(weather => [weather.description, weather])
+);
+
 async function getCityData(city_name) {
-    const today = new Date();
-    const day = today.getDate();
-    const month = today.getMonth(); 
-    const year = today.getFullYear();
+    const now = new Date();
 
     const hourlyQuery = `
         SELECT * FROM hourly_weather h
         JOIN dim_city c
             ON h.city_id = c.city_id
-        WHERE city_name = $1 AND 
-        EXTRACT(DAY from time) >= $2 AND
-        EXTRACT(MONTH from time) >= $3 AND
-        EXTRACT(YEAR from time) >= $4
+        WHERE city_name = $1 AND time >= $2  
         ORDER BY time;
     `;
 
@@ -73,15 +99,12 @@ async function getCityData(city_name) {
         SELECT * FROM daily_weather d
         JOIN dim_city c
             ON d.city_id = c.city_id
-        WHERE city_name = $1 AND 
-        EXTRACT(DAY from time) >= $2 AND
-        EXTRACT(MONTH from time) >= $3 AND
-        EXTRACT(YEAR from time) >= $4
+        WHERE city_name = $1 AND time >= $2
         ORDER BY time;
     `;
 
-    const hourly = await db.query(hourlyQuery, [city_name, day, month, year]);
-    const daily = await db.query(dailyQuery, [city_name, day, month, year]);
+    const hourly = await db.query(hourlyQuery, [city_name, now]);
+    const daily = await db.query(dailyQuery, [city_name, now]);
 
     return {
         hourly: hourly.rows,
@@ -98,23 +121,24 @@ app.post("/search", async (req, res) => {
         const city_name = req.body.city_name;
         const city_name_db = cities[city_name];
         const weather = await getCityData(city_name_db);
-        console.log(weather.hourly[0]);
+        //console.log(weather.hourly[0]);
 
         const day = weather.hourly[0].time.getDate();
         let month = weather.hourly[0].time.getMonth() + 1;
         if(month / 10 < 1) { month = "0" + String(month) }
         const weekDay = weather.hourly[0].time.getDay();
         const weekDaytoString = WeekDayMap.get(weekDay).name;
+        const weather_emoji = WeatherEmojiMap.get(weather.hourly[0].weather_description).emoji
 
         res.render("index.ejs", {citiesList : cities, 
             weather : weather,
             day : day,
             month : month,
-            weekDay : weekDaytoString})
+            weekDay : weekDaytoString,
+            weather_emoji : weather_emoji})
     } catch(err) {
         console.log(err)
     }
-    //res.redirect("/");
 });
 
 app.listen(port, () => {

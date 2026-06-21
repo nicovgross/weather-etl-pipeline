@@ -49,10 +49,10 @@
                 <div class="currentTemp">
 
                     <div class="tempRow">
-                        <h1><%= (typeof weather !== 'undefined' && weather.daily && weather.daily[0]) ? weather.daily[0].avg_temp : '--' %> </h1>
+                        <h1><%= Math.round(weather.hourly[0].temperature_c) %>° </h1>
 
                         <div class="weatherIcon">
-                            ☀️
+                            <%= weather_emoji %>
                         </div>
                     </div>
 
@@ -64,17 +64,17 @@
                     <div class="minMax">
                         <div>
                             <span>min</span>
-                            <strong>21°</strong>
+                            <strong> <%= Math.round(weather.daily[0].min_temp) %>° </strong>
                         </div>
 
                         <div>
                             <span>max</span>
-                            <strong>29°</strong>
+                            <strong> <%= Math.round(weather.daily[0].max_temp) %>° </strong>
                         </div>
                     </div>
 
                     <div class="rainChance">
-                        💧 21%
+                        💧 <%= weather.hourly[0].precipitation_probability_pct %>%
                     </div>
 
                 </div>
@@ -102,22 +102,22 @@
 
                 <div class="metric">
                     <span>Apparent Temp</span>
-                    <strong>28°</strong>
+                    <strong> <%= Math.round(weather.hourly[0].apparent_temperature_c) %>° </strong>
                 </div>
 
                 <div class="metric">
                     <span>Humidity</span>
-                    <strong>50%</strong>
+                    <strong> <%= weather.hourly[0].relative_humidity_pct %>% </strong>
                 </div>
 
                 <div class="metric">
                     <span>Wind Speed</span>
-                    <strong>20 km/h</strong>
+                    <strong><%= weather.hourly[0].wind_speed_kmh %> km/h</strong>
                 </div>
 
                 <div class="metric">
                     <span>Cloud Cover</span>
-                    <strong>30%</strong>
+                    <strong><%= weather.hourly[0].cloud_cover_pct %>%</strong>
                 </div>
 
             </div>
