@@ -23,6 +23,8 @@
 
     </aside>
     
+    <% if (weather) { %>
+
     <main class="mainContent">
 
         <!-- =========================
@@ -34,8 +36,9 @@
             <!-- Header -->
             <div class="cardHeader">
                 <div>
-                    <p class="sectionLabel">Sat</p>
-                    <h2>02/05</h2>
+                    <p class="sectionLabel"> <%= weekDay %> </p>
+                    
+                    <h2> <%= day %>/<%= month %> </h2>
                 </div>
             </div>
 
@@ -46,7 +49,7 @@
                 <div class="currentTemp">
 
                     <div class="tempRow">
-                        <h1>26°</h1>
+                        <h1><%= (typeof weather !== 'undefined' && weather.daily && weather.daily[0]) ? weather.daily[0].avg_temp : '--' %> </h1>
 
                         <div class="weatherIcon">
                             ☀️
@@ -281,5 +284,8 @@
         </section>
 
     </main>
+
+    <% } %>
+
 </body>
 </html>

@@ -38,27 +38,83 @@ for(let row of rows) {
     cities[formatCityName(row.city_name)] = row.city_name;
 }
 
-const query = "SELECT time, avg_temp, city_name FROM daily_weather d JOIN dim_city c ON d.city_id = c.city_id WHERE city_name = $1"
+const WeekDay = [
+    {index : 0, name : "Sun"},
+    {index : 1, name : "Mon"},
+    {index : 2, name : "Tue" },
+    {index : 3, name : "Wed"},
+    {index : 4, name : "Thu"},
+    {index : 5, name : "Fri"},
+    {index : 6, name : "Sat"}
+];
 
-async function getCity(city_name) {
-    const result = await db.query(query, [city_name]);
-    const rows = result.rows;
-    console.log(rows);
+const WeekDayMap = new Map(
+  WeekDay.map(day => [day.index, day])
+);
+
+async function getCityData(city_name) {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth(); 
+    const year = today.getFullYear();
+
+    const hourlyQuery = `
+        SELECT * FROM hourly_weather h
+        JOIN dim_city c
+            ON h.city_id = c.city_id
+        WHERE city_name = $1 AND 
+        EXTRACT(DAY from time) >= $2 AND
+        EXTRACT(MONTH from time) >= $3 AND
+        EXTRACT(YEAR from time) >= $4
+        ORDER BY time;
+    `;
+
+    const dailyQuery = `
+        SELECT * FROM daily_weather d
+        JOIN dim_city c
+            ON d.city_id = c.city_id
+        WHERE city_name = $1 AND 
+        EXTRACT(DAY from time) >= $2 AND
+        EXTRACT(MONTH from time) >= $3 AND
+        EXTRACT(YEAR from time) >= $4
+        ORDER BY time;
+    `;
+
+    const hourly = await db.query(hourlyQuery, [city_name, day, month, year]);
+    const daily = await db.query(dailyQuery, [city_name, day, month, year]);
+
+    return {
+        hourly: hourly.rows,
+        daily: daily.rows
+    };
 }
 
 app.get("/", (req, res) => {
-    res.render("index.ejs", {citiesList : cities});
+    res.render("index.ejs", {citiesList : cities, weather: null});
 });
 
 app.post("/search", async (req, res) => {
     try {
         const city_name = req.body.city_name;
         const city_name_db = cities[city_name];
-        await getCity(city_name_db);
+        const weather = await getCityData(city_name_db);
+        console.log(weather.hourly[0]);
+
+        const day = weather.hourly[0].time.getDate();
+        let month = weather.hourly[0].time.getMonth() + 1;
+        if(month / 10 < 1) { month = "0" + String(month) }
+        const weekDay = weather.hourly[0].time.getDay();
+        const weekDaytoString = WeekDayMap.get(weekDay).name;
+
+        res.render("index.ejs", {citiesList : cities, 
+            weather : weather,
+            day : day,
+            month : month,
+            weekDay : weekDaytoString})
     } catch(err) {
         console.log(err)
     }
-    res.redirect("/");
+    //res.redirect("/");
 });
 
 app.listen(port, () => {
