@@ -83,16 +83,28 @@
 
             <!-- Tabs -->
             <div class="weatherTabs">
-                <button class="active">temp</button>
-                <button>rain(%)</button>
-                <button>rain(mm)</button>
+                <button
+                    class="active"
+                    data-type="temp">
+                    Temperature (°C)
+                </button>
+
+                <button
+                    data-type="rain-prob">
+                    Precipitation (%)
+                </button>
+
+                <button
+                    data-type="rain-mm">
+                    Rain (mm)
+                </button>
             </div>
 
             <!-- Graph -->
             <div class="chartContainer">
 
                 <div class="chartPlaceholder">
-                    Chart Here
+                    <canvas id="weatherChart"></canvas>
                 </div>
 
             </div>
@@ -284,6 +296,17 @@
         </section>
 
     </main>
+
+    <script>
+        window.weatherData = <%- JSON.stringify(weather.hourly) %>;
+
+        console.log("EJS carregou");
+        console.log(window.weatherData);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/weatherChart.js"></script>
+
 
     <% } %>
 

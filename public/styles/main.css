@@ -166,6 +166,7 @@ body{
 
 .chartContainer{
     margin-bottom:25px;
+    height: 300px;
 }
 
 .chartPlaceholder{

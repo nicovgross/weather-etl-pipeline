@@ -86,12 +86,13 @@ const WeatherEmojiMap = new Map(
 
 async function getCityData(city_name) {
     const now = new Date();
+    now.setHours(now.getHours() - 1); 
 
     const hourlyQuery = `
         SELECT * FROM hourly_weather h
         JOIN dim_city c
             ON h.city_id = c.city_id
-        WHERE city_name = $1 AND time >= $2  
+        WHERE city_name = $1 AND time >= $2
         ORDER BY time;
     `;
 
