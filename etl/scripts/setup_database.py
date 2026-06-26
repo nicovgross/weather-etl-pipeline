@@ -35,12 +35,16 @@ cursor = conn.cursor()
 #Create dimension table city
 cursor.execute("""CREATE TABLE IF NOT EXISTS dim_city(
                 city_id SERIAL PRIMARY KEY,
-                city_name TEXT NOT NULL UNIQUE,
+                city_name TEXT NOT NULL,
+                city_display_name TEXT NOT NULL,
                 state TEXT,
+                state_display_name TEXT,
                 country TEXT,
+                country_display_name TEXT,
                 latitude DOUBLE PRECISION,
                 longitude DOUBLE PRECISION,
-                timezone TEXT);""")
+                timezone TEXT,
+                CONSTRAINT unique_city UNIQUE (city_name, state, country));""")
 
 cursor.execute("""CREATE TABLE IF NOT EXISTS hourly_weather(
                 time TIMESTAMP NOT NULL,

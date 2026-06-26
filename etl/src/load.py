@@ -6,7 +6,6 @@ from psycopg2.extras import execute_values
 def load_data(hourly_path, daily_path):
     df_hourly_weather = pd.read_parquet(hourly_path)
     df_daily_weather = pd.read_parquet(daily_path)
-    df_cities = pd.read_json("config/cities.json")
 
     #Connect to database
     conn = psycopg2.connect(
@@ -18,19 +17,6 @@ def load_data(hourly_path, daily_path):
     )
     conn.autocommit=True
     cursor = conn.cursor()
-
-    cities_insert_query = """INSERT INTO dim_city(
-                        city_name,
-                        state,
-                        country,
-                        latitude,
-                        longitude,
-                        timezone)
-                        VALUES %s
-                        ON CONFLICT (city_name) DO NOTHING;"""
-
-    cities_tuples = list(df_cities.itertuples(index=False, name=None))
-    execute_values(cursor, cities_insert_query, cities_tuples, page_size=1000) #inserts data in batches of 1000 rows
 
     cursor.execute("SELECT city_id, city_name FROM dim_city;")
     rows = cursor.fetchall()
