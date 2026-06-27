@@ -85,6 +85,13 @@ body{
     padding:25px;
 }
 
+/* TITLE */
+
+.title{
+    display: flex;
+    align-items: center;
+}
+
 .cardHeader{
     margin-bottom:20px;
 }
@@ -94,12 +101,9 @@ body{
     color:#666;
 }
 
-/* TITLE */
-
-.title{
-    display: flex;
+#cityName{
+    margin-bottom: 5px;
 }
-
 
 /* =========================
     WEATHER MAIN

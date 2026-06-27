@@ -111,7 +111,7 @@ app.post("/search", async (req, res) => {
         const city_name = req.body.city_name;
         const city_name_db = cities[city_name];
         const weather = await getCityData(city_name_db);
-        console.log(weather.hourly[0]);
+        //console.log(weather.hourly[0]);
 
         const day = weather.hourly[0].time.getDate();
         let month = weather.hourly[0].time.getMonth() + 1;

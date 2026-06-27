@@ -71,8 +71,6 @@ buttons.forEach(button => {
 
         const type = button.dataset.type;
 
-
-        // muda dados
         chart.data.datasets[0].label =
             datasets[type].label;
 
@@ -82,9 +80,6 @@ buttons.forEach(button => {
 
         chart.update();
 
-
-
-        // muda classe ativa
         buttons.forEach(btn =>
             btn.classList.remove("active")
         );
