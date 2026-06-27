@@ -112,12 +112,16 @@ def transform_data(raw_file_path, city_name):
     new_daily_weather["year"] = new_daily_weather["time"].dt.year
     new_daily_weather["month"] = new_daily_weather["time"].dt.month
 
+    hourly_paths = []
     for (year, month), group_df in new_hourly_weather.groupby(["year", "month"]):
-        hourly_path = f"data/processed/hourly_weather/{year}/{month:02d}/data.parquet"
-        store_processed_data(hourly_path, group_df)
+        path = f"data/processed/hourly_weather/{year}/{month:02d}/data.parquet"
+        store_processed_data(path, group_df)
+        hourly_paths.append(path)
  
+    daily_paths = []
     for (year, month), group_df in new_daily_weather.groupby(["year", "month"]):
-        daily_path = f"data/processed/daily_weather/{year}/{month:02d}/data.parquet"
-        store_processed_data(daily_path, group_df)
+        path = f"data/processed/daily_weather/{year}/{month:02d}/data.parquet"
+        store_processed_data(path, group_df)
+        daily_paths.append(path)
 
-    return hourly_path, daily_path
+    return hourly_paths, daily_paths

@@ -43,10 +43,11 @@ for city in cities:
         total_records += num_records
 
         logging.info("  Transforming...")
-        hourly_path, daily_path = transform_data(raw_file_path, city["city_name"])
+        hourly_paths, daily_paths = transform_data(raw_file_path, city["city_name"])
         
         logging.info("  Loading into database...")
-        load_data(hourly_path, daily_path)
+        for hourly, daily in zip(hourly_paths, daily_paths):
+            load_data(hourly, daily)
 
     except Exception as e:
         logging.error(e)

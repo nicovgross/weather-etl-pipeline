@@ -28,7 +28,7 @@ def load_data(hourly_path, daily_path):
     df_hourly_weather.drop(columns=["city_name"], inplace=True)
     df_daily_weather["city_id"] = df_daily_weather["city_name"].map(city_map)
     df_daily_weather.drop(columns=["city_name"], inplace=True)
-
+    
     #Make sure columns are in same order as insert query
     df_hourly_weather = df_hourly_weather[["time", "city_id", "temperature_c", "apparent_temperature_c", 
                                         "relative_humidity_pct", "precipitation_probability_pct", 
@@ -37,7 +37,7 @@ def load_data(hourly_path, daily_path):
     df_daily_weather = df_daily_weather[["time", "city_id", "avg_temp", "min_temp", "max_temp", 
                                         "temp_range", "avg_app_temp", "avg_hum", "avg_precipitation_prob", 
                                         "total_precipitation", "max_wind_speed" ]]
-
+    
     hourly_insert_query = """INSERT INTO hourly_weather(
                         time,
                         city_id,
@@ -73,7 +73,6 @@ def load_data(hourly_path, daily_path):
                     VALUES %s
                     ON CONFLICT (time, city_id) DO NOTHING;
                 """
-
     daily_tuples = list(df_daily_weather.itertuples(index=False, name=None))
     execute_values(cursor, daily_insert_query, daily_tuples, page_size=1000)
 
