@@ -34,13 +34,20 @@
         <section class="todayCard">
 
             <!-- Header -->
-            <div class="cardHeader">
-                <div>
-                    <p class="sectionLabel"> <%= weekDay %> </p>
-                    
-                    <h2> <%= day %>/<%= month %> </h2>
-                </div>
-            </div>
+            <div class="title">
+
+                <div class="cardHeader">
+                    <div>
+                        <p class="sectionLabel"> <%= weekDay %> </p>
+                        
+                        <h2> <%= day %>/<%= month %> </h2>
+                    </div>
+
+               </div>
+
+               <h1> <%= weather.daily[0].city_display_name %> </h1>
+
+            </div>            
 
             <!-- Main Weather -->
             <div class="weatherMain">

@@ -11,11 +11,29 @@ const labels = hourlyData.map(item => {
         hour: "2-digit",
         minute: "2-digit"
     });
-});
+}).slice(0, 24);
 
 const temperatures = hourlyData.map(
     item => item.temperature_c
-);
+).slice(0, 24);
+
+const datasets = {
+
+    temp: {
+        label: "Temperature (°C)",
+        data: hourlyData.map(item => item.temperature_c).slice(0, 24)
+    },
+
+    "rain-prob": {
+        label: "Rain Probability (%)",
+        data: hourlyData.map(item => item.precipitation_probability_pct).slice(0, 24)
+    },
+
+    "rain-mm": {
+        label: "Precipitation (mm)",
+        data: hourlyData.map(item => item.precipitation_mm).slice(0, 24)
+    }
+};
 
 const ctx = document
     .getElementById("weatherChart")
@@ -25,12 +43,13 @@ let chart = new Chart(ctx, {
     type: "line",
     data: {
         labels,
+
         datasets: [{
-            label: "Temperature (°C)",
-            data: temperatures,
+            label: datasets.temp.label,
+            data: datasets.temp.data,
             borderWidth: 2,
             borderColor: '#000000',
-            tension: 0.3
+            tension: 0
         }]
     },
     options: {
@@ -42,4 +61,36 @@ let chart = new Chart(ctx, {
             }
         }
     }
+});
+
+const buttons = document.querySelectorAll(".weatherTabs button");
+
+buttons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const type = button.dataset.type;
+
+
+        // muda dados
+        chart.data.datasets[0].label =
+            datasets[type].label;
+
+        chart.data.datasets[0].data =
+            datasets[type].data;
+
+
+        chart.update();
+
+
+
+        // muda classe ativa
+        buttons.forEach(btn =>
+            btn.classList.remove("active")
+        );
+
+        button.classList.add("active");
+
+    });
+
 });

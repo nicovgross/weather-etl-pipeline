@@ -94,6 +94,13 @@ body{
     color:#666;
 }
 
+/* TITLE */
+
+.title{
+    display: flex;
+}
+
+
 /* =========================
     WEATHER MAIN
 ========================= */

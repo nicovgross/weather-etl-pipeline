@@ -20,22 +20,11 @@ const db = new pg.Client({
 });
 db.connect();
 
-const doNotCapitalize = ["de", "da", "do"]
-
-function formatCityName(city_name) {
-    const new_name = city_name.replaceAll("_", " ");
-    return new_name.split(' ')                          
-    .map(word => doNotCapitalize.includes(word.toLowerCase()) 
-    ? word.toLowerCase() 
-    : (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()))
-    .join(' ');
-}
-
 const cities = {};
-const result = await db.query("SELECT DISTINCT city_name FROM dim_city");
+const result = await db.query("SELECT DISTINCT city_name, city_display_name FROM dim_city");
 const rows = result.rows;
 for(let row of rows) {
-    cities[formatCityName(row.city_name)] = row.city_name;
+    cities[row.city_display_name] = row.city_name;
 }
 
 const WeekDay = [
@@ -122,7 +111,7 @@ app.post("/search", async (req, res) => {
         const city_name = req.body.city_name;
         const city_name_db = cities[city_name];
         const weather = await getCityData(city_name_db);
-        //console.log(weather.hourly[0]);
+        console.log(weather.hourly[0]);
 
         const day = weather.hourly[0].time.getDate();
         let month = weather.hourly[0].time.getMonth() + 1;
