@@ -144,6 +144,11 @@ body{
     gap:30px;
 }
 
+.forecastMinMax{
+    display: flex;
+    gap: 15px;
+}
+
 /* =========================
     TABS
 ========================= */

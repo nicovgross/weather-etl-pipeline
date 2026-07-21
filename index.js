@@ -73,9 +73,23 @@ const WeatherEmojiMap = new Map(
   WEATHER_EMOJI.map(weather => [weather.description, weather])
 );
 
+function getDailyWeather(dayData) {
+    const count = {};
+
+    dayData.forEach(item => {
+        count[item.weather_description] =
+            (count[item.weather_description] || 0) + 1;
+    });
+
+    return Object.entries(count)
+        .sort((a, b) => b[1] - a[1])[0][0];
+}
+
 async function getCityData(city_name) {
     const now = new Date();
-    now.setHours(now.getHours() - 1); 
+    now.setHours(now.getHours() - 4); 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     const hourlyQuery = `
         SELECT * FROM hourly_weather h
@@ -94,7 +108,7 @@ async function getCityData(city_name) {
     `;
 
     const hourly = await db.query(hourlyQuery, [city_name, now]);
-    const daily = await db.query(dailyQuery, [city_name, now]);
+    const daily = await db.query(dailyQuery, [city_name, today]);
 
     return {
         hourly: hourly.rows,
@@ -111,21 +125,58 @@ app.post("/search", async (req, res) => {
         const city_name = req.body.city_name;
         const city_name_db = cities[city_name];
         const weather = await getCityData(city_name_db);
-        //console.log(weather.hourly[0]);
+
+        const groupedByDay = weather.hourly.reduce((acc, item) => {
+            // Criamos um objeto Date a partir do item.time (garante o funcionamento)
+            const dateObj = new Date(item.time);
+            
+            // Usamos getgetUTCDate e getUTCMonth para pegar o dia real do servidor/UTC
+            const day = dateObj.getUTCDate();
+            const month = dateObj.getUTCMonth() + 1; // +1 porque os meses no JS começam em 0
+            
+            const dateKey = `${day}/${month}`;
+            
+            if (!acc[dateKey]) {
+                acc[dateKey] = [];
+            }
+            
+            acc[dateKey].push(item);
+            return acc;
+        }, {});
+
+        const HourlyDailySplit = Object.values(groupedByDay);
 
         const day = weather.hourly[0].time.getDate();
         let month = weather.hourly[0].time.getMonth() + 1;
         if(month / 10 < 1) { month = "0" + String(month) }
-        const weekDay = weather.hourly[0].time.getDay();
-        const weekDaytoString = WeekDayMap.get(weekDay).name;
         const weather_emoji = WeatherEmojiMap.get(weather.hourly[0].weather_description).emoji
+
+        let weekdays = [];
+        weather.daily.forEach(day => {
+            let weekDay = day.time.getDay();
+            let weekDaytoString = WeekDayMap.get(weekDay).name;
+            weekdays.push(weekDaytoString);
+        });
+
+        const info = [];
+        for(let i=0; i<HourlyDailySplit.length; i++) {
+            const daily_info ={};
+            const time = HourlyDailySplit[i][0].time;
+            daily_info.weekday = WeekDayMap.get(time.getUTCDay()).name;
+            daily_info.day = Number(time.toISOString().substring(8, 10));
+            let month = Number(time.toISOString().substring(5, 7));
+            if(month / 10 < 1) { month = "0" + String(month) }
+            daily_info.month = month;
+            const description = getDailyWeather(HourlyDailySplit[i]);
+            daily_info.emoji = WeatherEmojiMap.get(description).emoji;
+            info.push(daily_info);
+        }
+        console.log(info)
 
         res.render("index.ejs", {citiesList : cities, 
             weather : weather,
-            day : day,
-            month : month,
-            weekDay : weekDaytoString,
-            weather_emoji : weather_emoji})
+            info : info,
+            HourlyDailySplit : HourlyDailySplit})
     } catch(err) {
         console.log(err)
     }

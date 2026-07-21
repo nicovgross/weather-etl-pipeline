@@ -38,9 +38,9 @@
 
                 <div class="cardHeader">
                     <div>
-                        <p class="sectionLabel"> <%= weekDay %> </p>
+                        <p class="sectionLabel"> <%= info[0].weekday %> </p>
                         
-                        <h2> <%= day %>/<%= month %> </h2>
+                        <h2> <%= info[0].day %>/<%= info[0].month %> </h2>
                     </div>
 
                </div>
@@ -61,7 +61,7 @@
                         <h1><%= Math.round(weather.hourly[0].temperature_c) %>° </h1>
 
                         <div class="weatherIcon">
-                            <%= weather_emoji %>
+                            <%= info[0].emoji %>
                         </div>
                     </div>
 
@@ -113,7 +113,7 @@
             <div class="chartContainer">
 
                 <div class="chartPlaceholder">
-                    <canvas id="weatherChart"></canvas>
+                    <canvas id="forecastChart-0"></canvas>
                 </div>
 
             </div>
@@ -151,21 +151,19 @@
 
         <section class="forecastCard">
 
-            <!-- Forecast Day -->
-            <div class="forecastItem expanded">
+            <% for(let i=1; i<weather.daily.length; i++) { %>
 
                 <div class="forecastHeader">
 
                     <div class="forecastLeft">
-
-                        <h3>Sun</h3>
-
-                        <div class="forecastTemp">
-                            26°
+                        <div>
+                            <p class="sectionLabel"> <%= info[i].weekday %> </p>
+                            
+                            <h2> <%= info[i].day %>/<%= info[i].month %> </h2>
                         </div>
 
                         <div class="forecastIcon">
-                            ☀️
+                            <%= info[i].emoji %>
                         </div>
 
                     </div>
@@ -173,144 +171,65 @@
                     <div class="forecastRight">
 
                         <div class="forecastMinMax">
-                            <span>min</span>
-                            <strong>21°</strong>
+                            <div>
+                                <span>min</span>
+                                <strong><%= Math.round(weather.daily[i].min_temp) %>°</strong>
+                            </div>
+                            
+                            <div>
+                                <span>max</span>
+                                <strong><%= Math.round(weather.daily[i].max_temp) %>°</strong>
+                            </div>
 
-                            <span>max</span>
-                            <strong>29°</strong>
                         </div>
 
                         <div class="forecastRain">
-                            💧 21%
+                            💧 <%= weather.daily[i].avg_precipitation_prob %> %
                         </div>
 
                     </div>
 
                 </div>
 
-                <!-- Expanded content -->
-                <div class="forecastDetails">
+                <div class="forecastItem">
 
-                    <div class="weatherTabs">
-                        <button class="active">temp</button>
-                        <button>rain(%)</button>
-                        <button>rain(mm)</button>
+                    <div class="forecastDetails">
+
+                        <div class="weatherTabs">
+                            <button class="active" data-type="temp">
+                                Temperature
+                            </button>
+
+                            <button data-type="rain-prob">
+                                Rain %
+                            </button>
+
+                            <button data-type="rain-mm">
+                                Rain mm
+                            </button>
+                        </div>
+                     
                     </div>
 
                     <div class="chartContainer">
 
                         <div class="chartPlaceholder">
-                            Chart Here
-                        </div>
-
-                    </div>
-
-                    <div class="metrics">
-
-                        <div class="metric">
-                            <span>Apparent Temp</span>
-                            <strong>28°</strong>
-                        </div>
-
-                        <div class="metric">
-                            <span>Humidity</span>
-                            <strong>50%</strong>
-                        </div>
-
-                        <div class="metric">
-                            <span>Wind Speed</span>
-                            <strong>20 km/h</strong>
-                        </div>
-
-                        <div class="metric">
-                            <span>Cloud Cover</span>
-                            <strong>30%</strong>
+                            <canvas id="forecastChart-<%= i %>"></canvas>
                         </div>
 
                     </div>
 
                 </div>
 
-            </div>
-
-            <!-- Other Days -->
-            <div class="forecastItem collapsed">
-
-                <div class="forecastHeader">
-
-                    <div class="forecastLeft">
-
-                        <h3>Mon</h3>
-
-                        <div class="forecastTemp">
-                            26°
-                        </div>
-
-                        <div class="forecastIcon">
-                            ☀️
-                        </div>
-
-                    </div>
-
-                    <div class="forecastRight">
-
-                        <div class="forecastMinMax">
-                            <span>21° / 29°</span>
-                        </div>
-
-                        <div class="forecastRain">
-                            💧 21%
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="forecastItem collapsed">
-
-                <div class="forecastHeader">
-
-                    <div class="forecastLeft">
-
-                        <h3>Tue</h3>
-
-                        <div class="forecastTemp">
-                            26°
-                        </div>
-
-                        <div class="forecastIcon">
-                            ☀️
-                        </div>
-
-                    </div>
-
-                    <div class="forecastRight">
-
-                        <div class="forecastMinMax">
-                            <span>21° / 29°</span>
-                        </div>
-
-                        <div class="forecastRain">
-                            💧 21%
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+            <% } %>
 
         </section>
 
     </main>
 
     <script>
-        window.weatherData = <%- JSON.stringify(weather.hourly) %>;
-
-        console.log("EJS carregou");
-        console.log(window.weatherData);
+        window.HourlyData = <%- JSON.stringify(weather.hourly) %>;
+        window.HourlyDailySplit = <%- JSON.stringify(HourlyDailySplit) %>;
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
