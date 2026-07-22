@@ -146,18 +146,6 @@ app.post("/search", async (req, res) => {
 
         const HourlyDailySplit = Object.values(groupedByDay);
 
-        const day = weather.hourly[0].time.getDate();
-        let month = weather.hourly[0].time.getMonth() + 1;
-        if(month / 10 < 1) { month = "0" + String(month) }
-        const weather_emoji = WeatherEmojiMap.get(weather.hourly[0].weather_description).emoji
-
-        let weekdays = [];
-        weather.daily.forEach(day => {
-            let weekDay = day.time.getDay();
-            let weekDaytoString = WeekDayMap.get(weekDay).name;
-            weekdays.push(weekDaytoString);
-        });
-
         const info = [];
         for(let i=0; i<HourlyDailySplit.length; i++) {
             const daily_info ={};
@@ -171,7 +159,6 @@ app.post("/search", async (req, res) => {
             daily_info.emoji = WeatherEmojiMap.get(description).emoji;
             info.push(daily_info);
         }
-        console.log(info)
 
         res.render("index.ejs", {citiesList : cities, 
             weather : weather,
