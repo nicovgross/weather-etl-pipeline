@@ -1,11 +1,13 @@
 # Weather ETL Pipeline
 This project implements an ETL pipeline that extracts, transforms and loads weather data. The goal of this project is to develop my skills in data engineering and data analysis and to deepen my understanding of data pipelines.
 
-### Setup
+### Setup and Execution
 The requirements for this project are detailed in requirements.txt. Run:
 ```bash
 pip install -r requirements.txt
 ```
+
+The following commands are to be executed from the `etl` folder.
 
 Before running main, create the PostgreSQL database and necessary tables:
 ```bash
@@ -27,6 +29,16 @@ setx VARIABLE_NAME value
 For linux:
 ```bash
 export VARIABLE_NAME=value
+```
+
+To run the pipeline:
+```bash
+python src/main.py
+```
+
+To run without logs:
+```bash
+python src/main.py no-log
 ```
 
 ## Extraction

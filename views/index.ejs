@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/main.css">
+    <title>Weather</title>
+</head>
+<body>
+
+    <aside class="sidebar">
+
+        <form class="searchBar" action="/search" method="post">
+
+            <input list="cities" name="city_name" placeholder="Select location" />
+            <datalist id="cities">
+                <% for(let city of Object.values(citiesList)) {%>
+                    <option value="<%= city %>">
+                <% } %>
+            </datalist>
+
+        </form>
+
+    </aside>
+    
+    <% if (weather) { %>
+
+    <main class="mainContent">
+
+        <!-- =========================
+            TODAY WEATHER
+        ========================== -->
+
+        <section class="todayCard">
+
+            <!-- Header -->
+            <div class="title">
+
+                <div class="cardHeader">
+                    <div>
+                        <p class="sectionLabel"> <%= info[0].weekday %> </p>
+                        
+                        <h2> <%= info[0].day %>/<%= info[0].month %> </h2>
+                    </div>
+
+               </div>
+
+               <div style="border-left: 3px solid #333; height: 40px; margin: 0 15px;"></div>
+
+               <h1 id="cityName"> <%= weather.daily[0].city_display_name %> </h1>
+
+            </div>            
+
+            <!-- Main Weather -->
+            <div class="weatherMain">
+
+                <!-- Left -->
+                <div class="currentTemp">
+
+                    <div class="tempRow">
+                        <h1><%= Math.round(weather.hourly[0].temperature_c) %>° </h1>
+
+                        <div class="weatherIcon">
+                            <%= info[0].emoji %>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right -->
+                <div class="weatherInfo">
+
+                    <div class="minMax">
+                        <div>
+                            <span>min</span>
+                            <strong> <%= Math.round(weather.daily[0].min_temp) %>° </strong>
+                        </div>
+
+                        <div>
+                            <span>max</span>
+                            <strong> <%= Math.round(weather.daily[0].max_temp) %>° </strong>
+                        </div>
+                    </div>
+
+                    <div class="rainChance">
+                        💧 <%= weather.hourly[0].precipitation_probability_pct %>%
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Tabs -->
+            <div class="weatherTabs">
+                <button
+                    class="active"
+                    data-type="temp">
+                    Temperature (°C)
+                </button>
+
+                <button
+                    data-type="rain-prob">
+                    Precipitation (%)
+                </button>
+
+                <button
+                    data-type="rain-mm">
+                    Rain (mm)
+                </button>
+            </div>
+
+            <!-- Graph -->
+            <div class="chartContainer">
+
+                <div class="chartPlaceholder">
+                    <canvas id="forecastChart-0"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics">
+
+                <div class="metric">
+                    <span>Apparent Temp</span>
+                    <strong> <%= Math.round(weather.hourly[0].apparent_temperature_c) %>° </strong>
+                </div>
+
+                <div class="metric">
+                    <span>Humidity</span>
+                    <strong> <%= weather.hourly[0].relative_humidity_pct %>% </strong>
+                </div>
+
+                <div class="metric">
+                    <span>Wind Speed</span>
+                    <strong><%= weather.hourly[0].wind_speed_kmh %> km/h</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Cloud Cover</span>
+                    <strong><%= weather.hourly[0].cloud_cover_pct %>%</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+            FORECAST SECTION
+        ========================== -->
+
+        <section class="forecastCard">
+
+            <% for(let i=1; i<weather.daily.length; i++) { %>
+
+                <div class="forecastHeader">
+
+                    <div class="forecastLeft">
+                        <div>
+                            <p class="sectionLabel"> <%= info[i].weekday %> </p>
+                            
+                            <h2> <%= info[i].day %>/<%= info[i].month %> </h2>
+                        </div>
+
+                        <div class="forecastIcon">
+                            <%= info[i].emoji %>
+                        </div>
+
+                    </div>
+
+                    <div class="forecastRight">
+
+                        <div class="forecastMinMax">
+                            <div>
+                                <span>min</span>
+                                <strong><%= Math.round(weather.daily[i].min_temp) %>°</strong>
+                            </div>
+                            
+                            <div>
+                                <span>max</span>
+                                <strong><%= Math.round(weather.daily[i].max_temp) %>°</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="forecastRain">
+                            💧 <%= weather.daily[i].avg_precipitation_prob %> %
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="forecastItem">
+
+                    <div class="forecastDetails">
+
+                        <div class="weatherTabsForecast-<%= i %>">
+                            <button class="active" data-type="temp">
+                                Temperature (°C)
+                            </button>
+
+                            <button data-type="rain-prob">
+                                Precipitation (%)
+                            </button>
+
+                            <button data-type="rain-mm">
+                                Rain (mm)
+                            </button>
+                        </div>
+                     
+                    </div>
+
+                    <div class="chartContainer">
+
+                        <div class="chartPlaceholder">
+                            <canvas id="forecastChart-<%= i %>"></canvas>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <% } %>
+
+        </section>
+
+    </main>
+
+    <script>
+        window.HourlyData = <%- JSON.stringify(weather.hourly) %>;
+        window.HourlyDailySplit = <%- JSON.stringify(HourlyDailySplit) %>;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/weatherChart.js"></script>
+
+
+    <% } %>
+
+</body>
+</html>

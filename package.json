@@ -1,0 +1,26 @@
+{
+  "name": "weather-etl-pipeline",
+  "version": "1.0.0",
+  "description": "This project implements an ETL pipeline that extracts, transforms and loads weather data. The goal of this project is to develop my skills in data engineering and data analysis and to deepen my understanding of data pipelines.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicovgross/weather-etl-pipeline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nicovgross/weather-etl-pipeline/issues"
+  },
+  "homepage": "https://github.com/nicovgross/weather-etl-pipeline#readme",
+  "dependencies": {
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  }
+}
