@@ -20,43 +20,43 @@ body{
     SIDEBAR
 ========================= */
 
-.sidebar{
-    width:250px;
-    background:white;
-
-    border:2px solid black;
-
-    padding:20px;
+.sidebar {
+    width: 260px;
+    background: white;
+    border: 2px solid black;
+    padding: 25px;
 }
 
-.searchBar{
-    display:flex;
-    align-items:center;
-
-    border:2px solid black;
-    border-radius:40px;
-
-    overflow:hidden;
+.sidebarTitle {
+    display: block;
+    margin-bottom: 12px;
+    font-size: .9rem;
+    color: #666;
+    font-weight: bold;
 }
 
-.searchBar input{
-    flex:1;
+#citySelect {
+    width: 100%;
+    padding: 14px 16px;
 
-    border:none;
-    outline:none;
+    font-size: 1rem;
 
-    padding:10px 15px;
+    border: 2px solid black;
+    border-radius: 12px;
 
-    font-size:1rem;
+    background: white;
+    cursor: pointer;
+
+    transition: .2s;
 }
 
-.searchBar button{
-    border:none;
-    background:white;
+#citySelect:hover {
+    background: #fafafa;
+}
 
-    padding:8px 12px;
-
-    cursor:pointer;
+#citySelect:focus {
+    outline: none;
+    box-shadow: 4px 4px 0 black;
 }
 
 /* =========================

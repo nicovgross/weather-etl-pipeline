@@ -127,12 +127,10 @@ app.post("/search", async (req, res) => {
         const weather = await getCityData(city_name_db);
 
         const groupedByDay = weather.hourly.reduce((acc, item) => {
-            // Criamos um objeto Date a partir do item.time (garante o funcionamento)
             const dateObj = new Date(item.time);
             
-            // Usamos getgetUTCDate e getUTCMonth para pegar o dia real do servidor/UTC
             const day = dateObj.getUTCDate();
-            const month = dateObj.getUTCMonth() + 1; // +1 porque os meses no JS começam em 0
+            const month = dateObj.getUTCMonth() + 1; 
             
             const dateKey = `${day}/${month}`;
             
@@ -160,7 +158,7 @@ app.post("/search", async (req, res) => {
             info.push(daily_info);
         }
 
-        res.render("index.ejs", {citiesList : cities, 
+        res.render("index.ejs", {citiesList : Object.keys(cities), 
             weather : weather,
             info : info,
             HourlyDailySplit : HourlyDailySplit})
