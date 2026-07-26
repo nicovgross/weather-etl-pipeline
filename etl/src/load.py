@@ -2,6 +2,12 @@ import pandas as pd
 import os
 import psycopg2
 from psycopg2.extras import execute_values
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parent.parent / ".env"
+
+load_dotenv(env_path, override=True)
 
 def load_data(hourly_path, daily_path):
     df_hourly_weather = pd.read_parquet(hourly_path)
@@ -9,10 +15,10 @@ def load_data(hourly_path, daily_path):
 
     #Connect to database
     conn = psycopg2.connect(
-        dbname=os.getenv("POSTGRES_DB", "weather_db"),
+        dbname=os.getenv("POSTGRES_DB"),
         user=os.getenv("POSTGRES_USER"),
         password=os.getenv("POSTGRES_PASSWORD"),
-        host=os.getenv("POSTGRES_HOST", "localhost"),
+        host=os.getenv("POSTGRES_HOST"),
         port=os.getenv("POSTGRES_PORT", "5432")
     )
     conn.autocommit=True

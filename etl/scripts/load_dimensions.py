@@ -3,6 +3,12 @@ import psycopg2
 from psycopg2.extras import execute_values
 import os
 import logging
+from dotenv import load_dotenv
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parent.parent / ".env"
+
+load_dotenv(env_path, override=True)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,10 +20,10 @@ df_cities = pd.read_json("config/cities.json")
 
 #Connect to database
 conn = psycopg2.connect(
-    dbname=os.getenv("POSTGRES_DB", "weather_db"),
+    dbname=os.getenv("POSTGRES_DB"),
     user=os.getenv("POSTGRES_USER"),
     password=os.getenv("POSTGRES_PASSWORD"),
-    host=os.getenv("POSTGRES_HOST", "localhost"),
+    host=os.getenv("POSTGRES_HOST"),
     port=os.getenv("POSTGRES_PORT", "5432")
 )
 
@@ -35,7 +41,7 @@ cities_insert_query = """INSERT INTO dim_city(
                         longitude,
                         timezone)
                         VALUES %s
-                        ON CONFLICT (city_name)
+                        ON CONFLICT (city_name, state, country)
                         DO UPDATE SET
                             city_display_name = EXCLUDED.city_display_name,
                             state = EXCLUDED.state,
@@ -49,12 +55,9 @@ cities_insert_query = """INSERT INTO dim_city(
 cities_tuples = list(df_cities.itertuples(index=False, name=None))
 try:
     execute_values(cursor, cities_insert_query, cities_tuples, page_size=1000) #inserts data in batches of 1000 rows
-    rows = cursor.fetchall()
-    logger.info(f"{len(rows)} cities processed successfully")
-
-    for city in rows:
-        logger.info(f"Processed city: {city[0]}")
 
 except psycopg2.Error as e:
     logger.error(f"Error updating dim_city: {e}")
 
+cursor.close()
+conn.close()
