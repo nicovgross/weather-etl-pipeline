@@ -8,15 +8,17 @@ const port = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-const pg_db = process.env.POSTGRES_DB
-const pg_pw = process.env.POSTGRES_PASSWORD
+process.loadEnvFile();
 
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: pg_db,
-    password: pg_pw,
-    port: 5432
+    database: process.env.POSTGRES_DB,
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    host: process.env.POSTGRES_HOST,
+    port: process.env.POSTGRES_PORT,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 db.connect();
 
@@ -117,7 +119,7 @@ async function getCityData(city_name) {
 }
 
 app.get("/", (req, res) => {
-    res.render("index.ejs", {citiesList : cities, weather: null});
+    res.render("index.ejs", {citiesList : Object.keys(cities), weather: null});
 });
 
 app.post("/search", async (req, res) => {
@@ -149,7 +151,9 @@ app.post("/search", async (req, res) => {
             const daily_info ={};
             const time = HourlyDailySplit[i][0].time;
             daily_info.weekday = WeekDayMap.get(time.getUTCDay()).name;
-            daily_info.day = Number(time.toISOString().substring(8, 10));
+            let day = Number(time.toISOString().substring(8, 10));
+            if(day / 10 < 1) { day = "0" + String(day) }
+            daily_info.day = day;
             let month = Number(time.toISOString().substring(5, 7));
             if(month / 10 < 1) { month = "0" + String(month) }
             daily_info.month = month;
