@@ -22,12 +22,17 @@ const db = new pg.Client({
 });
 db.connect();
 
-const cities = {};
-const result = await db.query("SELECT DISTINCT city_name, city_display_name FROM dim_city");
+const cities = [];
+const result = await db.query("SELECT DISTINCT city_name, city_display_name, state_code FROM dim_city");
 const rows = result.rows;
 for(let row of rows) {
-    cities[row.city_display_name] = row.city_name;
+    cities.push({"city_name": row.city_name,
+                 "city_display_name": row.city_display_name,
+                 "state_code": row.state_code
+                });
 }
+const citiesList = cities.map(city => city.city_display_name);
+citiesList.sort();
 
 const WeekDay = [
     {index : 0, name : "Sun"},
@@ -119,13 +124,13 @@ async function getCityData(city_name) {
 }
 
 app.get("/", (req, res) => {
-    res.render("index.ejs", {citiesList : Object.keys(cities), weather: null});
+    res.render("index.ejs", {citiesList : citiesList, weather: null});
 });
 
 app.post("/search", async (req, res) => {
     try {
-        const city_name = req.body.city_name;
-        const city_name_db = cities[city_name];
+        const selectedCity = cities.filter(city => city.city_display_name === req.body.city_name)[0];
+        const city_name_db = selectedCity.city_name;
         const weather = await getCityData(city_name_db);
 
         const groupedByDay = weather.hourly.reduce((acc, item) => {
@@ -161,8 +166,9 @@ app.post("/search", async (req, res) => {
             daily_info.emoji = WeatherEmojiMap.get(description).emoji;
             info.push(daily_info);
         }
-
-        res.render("index.ejs", {citiesList : Object.keys(cities), 
+        
+        res.render("index.ejs", {citiesList : citiesList, 
+            city: selectedCity,
             weather : weather,
             info : info,
             HourlyDailySplit : HourlyDailySplit})
