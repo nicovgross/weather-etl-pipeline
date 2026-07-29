@@ -1,6 +1,6 @@
 requests
 pandas
 fastparquet
-psycopg2
-sqlalchemy
-streamlit
+psycopg2-binary
+python-dotenv
+boto3
