@@ -1,12 +1,13 @@
 import requests
 import pandas as pd
 import os
-import logging
 
 '''
 This program extracts raw data from the Open-Meteo API, 
 gets the hourly data and stores it in a JSON file
 '''
+
+BASE_DIR = os.getenv("BASE_DIR", "")
             
 def print_weather_data(weather_data):
     for key, value in weather_data.items():
@@ -29,7 +30,7 @@ def extract_data(params):
         date = data["current_weather"]["time"][:10] #Get current date
 
         #Make sure the file path already exist
-        raw_file_path = f"data/raw/{params['city_name']}/{date}.parquet"
+        raw_file_path = os.path.join(BASE_DIR, "data", "raw", params["city_name"], f"{date}.parquet")
         dir_path = os.path.dirname(raw_file_path)
         os.makedirs(dir_path, exist_ok=True)
 

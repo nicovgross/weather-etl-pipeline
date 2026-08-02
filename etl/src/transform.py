@@ -2,6 +2,8 @@ import pandas as pd
 import os
 from fastparquet import write
 
+BASE_DIR = os.getenv("BASE_DIR", "")
+
 WEATHER_CODE_MAP = {
         0: "Clear sky",
         1: "Mainly clear",
@@ -34,16 +36,28 @@ WEATHER_CODE_MAP = {
 #Store the new data in specified path
 def store_processed_data(path, new_data_df):
     accumulated_data = pd.DataFrame()
-    if os.path.isfile(path): 
-        accumulated_data = pd.read_parquet(path)
-    else:
-        dir_path = os.path.dirname(path)
-        os.makedirs(dir_path, exist_ok=True)
 
-    new_data_df = new_data_df.drop(columns=["year","month","day","hour"], errors="ignore") #Remove data only used in calculations
-    accumulated_data = pd.concat([accumulated_data, new_data_df], axis=0) #Adds new data to table
-    accumulated_data.drop_duplicates(subset=["time", "city_name"], inplace=True) #Make sure there are no duplicates
-    accumulated_data = accumulated_data.sort_values(by="time")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    if os.path.isfile(path):
+        accumulated_data = pd.read_parquet(path)
+
+    new_data_df = new_data_df.drop(
+        columns=["year", "month", "day", "hour"],
+        errors="ignore"
+    )
+
+    accumulated_data = pd.concat(
+        [accumulated_data, new_data_df],
+        axis=0
+    )
+
+    accumulated_data.drop_duplicates(
+        subset=["time", "city_name"],
+        inplace=True
+    )
+
+    accumulated_data = accumulated_data.sort_values("time")
 
     write(path, accumulated_data)
 
@@ -114,13 +128,13 @@ def transform_data(raw_file_path, city_name):
 
     hourly_paths = []
     for (year, month), group_df in new_hourly_weather.groupby(["year", "month"]):
-        path = f"data/processed/hourly_weather/{year}/{month:02d}/data.parquet"
+        path = os.path.join( BASE_DIR, "data", "processed", "hourly_weather", str(year), f"{month:02d}", "data.parquet")
         store_processed_data(path, group_df)
         hourly_paths.append(path)
  
     daily_paths = []
     for (year, month), group_df in new_daily_weather.groupby(["year", "month"]):
-        path = f"data/processed/daily_weather/{year}/{month:02d}/data.parquet"
+        path = os.path.join( BASE_DIR, "data", "processed", "daily_weather", str(year), f"{month:02d}", "data.parquet")
         store_processed_data(path, group_df)
         daily_paths.append(path)
 
