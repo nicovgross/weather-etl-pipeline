@@ -6,6 +6,8 @@ The project was developed to strengthen my skills in Data Engineering, Cloud Com
 ## Architecture
 The pipeline follows the architecture below:
 
+<img width="1497" height="392" alt="image" src="https://github.com/user-attachments/assets/4963931d-2309-40b9-a9bf-a6feb8c4d3cf" />
+
 - Amazon EventBridge Scheduler triggers the pipeline every 6 hours.
 - AWS Lambda runs the ETL pipeline inside a Docker container.
 - Weather data is extracted from the Open-Meteo API.
@@ -13,6 +15,17 @@ The pipeline follows the architecture below:
 - Processed data is loaded into an Amazon RDS PostgreSQL database.
 - A Node.js/Express backend running on an Amazon EC2 instance queries the database.
 - The frontend consumes the backend API and displays the weather information.
+
+## Technologies
+
+- Python
+- Pandas
+- PostgreSQL
+- Docker
+- AWS
+- Node.js
+- Express
+- PM2
 
 ## Setup
 Install dependencies for etl pipeline:
@@ -41,7 +54,7 @@ AWS_BUCKET_NAME
 BASE_DIR
 ```
 
-If you are executing the pipeline from a Lambda function, the AWS environment variables should automatically be setup by `boto3`
+When executed on AWS Lambda, AWS credentials are automatically provided through the Lambda execution role. Therefore, AWS environment variables are only required for local execution.
 
 Run pipeline:
 ```bash
@@ -51,7 +64,7 @@ python etl/src/main.py
 ## ETL
 
 ### Extraction
-The weather data is extracted from the Open-Meteo API, which is open-source and doesn't require a key. For every city in file `etl/config/cities.json`, a request is sent to the API for the hourly data from today in that city. Then, the data is stored in Parquet files inside `data/raw`. The raw files are then sent to the S3 bucket.
+For every city listed in `etl/config/cities.json`, the pipeline requests hourly weather data from the Open-Meteo API. The extracted data is stored locally as Parquet files under `data/raw` and then uploaded to Amazon S3.
 
 - temperature
 - apparent temperature
@@ -64,14 +77,14 @@ The weather data is extracted from the Open-Meteo API, which is open-source and 
 - cloud cover
 
 ### Transformation
-For the transformation step, the extracted data is first standardized(renaming columns, converting time from string do datetime). Then it is normalized, correcting possible inconsistencies and checking missing data. A new column is added: weather description. At last the data is divided into two dataframes: 
+For the transformation step, the extracted data is first standardized(renaming columns, converting timestamps from strings to datetime objects. Then it is validated, correcting possible inconsistencies and checking missing data. A new column is added: weather description. At last the data is divided into two dataframes: 
 - hourly_weather: Detailed hourly measurements for each city.
 - daily_weather: Aggregated daily metrics, calculated using hourly_weather.
 
 Then, the transformed data is partitioned in buckets of year and month and stored in `data/processed`, also in the S3 bucket.
 
 ### Loading
-After transformation, the processed data is loaded into a AWS RDS PostgreSQL database. The database schema includes:
+After transformation, the processed data is loaded into a AWS RDS PostgreSQL database. The database schema contains:
 
 - dim_city: dimension table containing city metadata
 - hourly_weather: hourly weather measurements
@@ -83,13 +96,18 @@ python etl/scripts/load_all.py
 ``` 
 
 ## Database schema
-
+<img width="537" height="737" alt="image" src="https://github.com/user-attachments/assets/8c038a42-ea83-43e2-a9bf-25d12fd68ece" />
 
 ## AWS Deployment
 - The pipeline is containarized using Docker.
 - The Docker image is loaded into Amazon ECR.
 - A Lambda function is created using the image imported from ECR.
 - EventBridge Scheduler executes the Lambda function every 6 hours feeding the PostgreSQL database.
+
+Login to AWS
+```bash
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+```
 
 Build Docker image:
 ```bash
@@ -107,7 +125,7 @@ docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/<repo_name>:latest
 ```
 
 ## Web Application
-The web application is built with Node.js and Express and is deployed on an Amazon EC2 instance.
+The web application is built with Node.js and Express and is hosted on an Amazon EC2 instance.
 
 The backend:
 
@@ -115,3 +133,6 @@ The backend:
 - Retrieves historical weather information
 - Serves the frontend dashboard
 - Runs continuously using PM2
+
+## Demo
+<img width="1820" height="840" alt="image" src="https://github.com/user-attachments/assets/41cd877f-29e4-4711-b8c9-57f75278555f" />
