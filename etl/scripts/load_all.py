@@ -7,5 +7,7 @@ for city in os.listdir(raw):
     path = os.path.join(raw, city)
     for file in os.listdir(path):
         file_path = os.path.join(path, file)
-        hourly_path, daily_path = transform_data(file_path, city)
-        load_data(hourly_path, daily_path)
+        hourly_paths, daily_paths = transform_data(file_path, city["city_name"])
+
+        for hourly, daily in zip(hourly_paths, daily_paths):
+            load_data(hourly, daily)
