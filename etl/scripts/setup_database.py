@@ -37,7 +37,7 @@ try:
                     city_display_name TEXT NOT NULL,
                     state TEXT,
                     state_display_name TEXT,
-                    state_code CHAR(2)
+                    state_code CHAR(2),
                     country TEXT,
                     country_display_name TEXT,
                     latitude DOUBLE PRECISION,
