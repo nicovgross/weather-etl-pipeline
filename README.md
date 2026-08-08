@@ -134,5 +134,123 @@ The backend:
 - Serves the frontend dashboard
 - Runs continuously using PM2
 
+## EC2 Setup
+After connecting to the EC2 instance through SSH, install Node.js and npm according to the operating system being used.
+
+Clone the repository:
+
+```bash
+git clone <repository_url>
+cd <repository_directory>
+```
+
+Install the Node.js dependencies:
+
+```bash
+npm install
+```
+
+## PM2
+PM2 is used to keep the Node.js application running continuously and automatically restart it if the process stops.
+
+Install PM2:
+
+```bash
+sudo npm install -g pm2
+```
+
+Start the application:
+
+```bash
+pm2 start index.js --name weather-app
+```
+
+Check the application status:
+
+```bash
+pm2 status
+```
+
+## Nginx
+Nginx is used as a reverse proxy, forwarding public HTTP/HTTPS requests to the Node.js application running on port 3000.
+
+Install Nginx:
+
+```bash
+sudo apt update
+sudo apt install nginx -y
+```
+
+Enable and start Nginx:
+
+```bash
+sudo systemctl enable --now nginx
+```
+
+Create the Nginx configuration:
+
+```bash
+sudo nano /etc/nginx/sites-available/dailyweather
+```
+
+Example configuration:
+```
+server {
+    listen 80;
+    server_name dailyweather.dev;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Enable the configuration:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/dailyweather /etc/nginx/sites-enabled/
+```
+
+Remove the default configuration:
+
+```bash
+sudo rm /etc/nginx/sites-enabled/default
+```
+
+Test the Nginx configuration:
+
+```bash
+sudo nginx -t
+```
+
+Reload Nginx:
+
+```bash
+sudo systemctl reload nginx
+```
+
+## HTTPS
+The application uses a .dev domain, which requires HTTPS.
+
+Certbot and the Nginx plugin can be installed with:
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+```
+
+Generate and configure the SSL certificate:
+
+```bash
+sudo certbot --nginx -d dailyweather.dev
+```
+
+Certbot automatically configures the certificate and can redirect HTTP requests to HTTPS.
+
+The application is then accessible at: https://dailyweather.dev
+
 ## Demo
 <img width="1820" height="840" alt="image" src="https://github.com/user-attachments/assets/41cd877f-29e4-4711-b8c9-57f75278555f" />
